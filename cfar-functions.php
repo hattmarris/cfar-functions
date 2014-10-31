@@ -299,7 +299,7 @@ function cfar_export_master_function() {
 								foreach($tickets as $ticket) {
 									$statuses = '';
 									$cores = '';
-									$cores = get_the_terms( $ticket->ID, 'type' );
+									$cores = get_the_terms( $ticket->ID, 'core' );
 									if($cores){$core = array_pop($cores);}
 									$statuses = get_the_terms($ticket->ID, 'status');
 									if($statuses) {
