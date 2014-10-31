@@ -501,7 +501,7 @@ function cfar_remove_wpas_ticket_attachments() {
 }
 
 /**
- * Remove the customsidebars-mb metabox from plugin on CFAR staging and production environment
+ * Remove the customsidebars-mb metabox from plugin on CFAR staging and production environment - priority of 11 to override custom sidebars plugin
  */
 add_action( 'add_meta_boxes', 'cfar_remove_customsidebars_mb', 11);
 function cfar_remove_customsidebars_mb() {
