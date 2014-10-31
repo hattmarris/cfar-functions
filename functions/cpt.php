@@ -38,6 +38,49 @@
 	//register_post_type( 'awards', $args );
 }*/
 
+/**
+* Removing the Types Taxonomy in favor of Shared Cores Functionality
+*/
+
+/**
+* Adding Shared Cores Taxonomy for tickets and projects
+*/
+add_action('init', 'cfar_add_core_tickets_projects_taxonomy');
+if ( !function_exists('cfar_add_core_tickets_projects_taxonomy') ) {
+	function cfar_add_core_tickets_projects_taxonomy() {
+			/******* Ticket / Project Core Post Taxonomy *******/
+			// Add new taxonomy, make it hierarchical 
+			$labels = array(
+				'name'              => _x( 'Cores', 'taxonomy general name' ),
+				'singular_name'     => _x( 'Core', 'taxonomy singular name' ),
+				'search_items'      => __( 'Search Cores' ),
+				'all_items'         => __( 'All Cores' ),
+				'parent_item'       => __( 'Parent Core' ),
+				'parent_item_colon' => __( 'Parent Core:' ),
+				'edit_item'         => __( 'Edit Core' ),
+				'update_item'       => __( 'Update Core' ),
+				'add_new_item'      => __( 'Add New Core' ),
+				'new_item_name'     => __( 'New Core Name' ),
+				'menu_name'         => __( 'Cores' ),
+			);
+			
+			$args = array(
+			'hierarchical'      => true,
+			'labels'            => $labels,
+			'show_ui'           => true,
+			'show_admin_column' => true,
+			'query_var'         => true,
+			'rewrite'           => array( 'slug' => 'core' ),
+		);
+		
+		register_taxonomy( 'core', array ('tickets', 'projects'), $args );
+		
+		register_taxonomy_for_object_type( 'core', 'tickets' );	
+		register_taxonomy_for_object_type( 'core', 'projects' );	
+	}
+}
+
+
 /** 
 * Creates Custom Projects Post Type 
 */
