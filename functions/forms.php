@@ -1,4 +1,9 @@
 <?php
+/**
+* Actions and Functions after Gravity Forms submission
+*
+* Form id for the Gravity Forms MUST be == 2, if necessary when going to new environment reset auto increment for forms table in database
+*/
 //Pulls PI list for form two pi options
 add_filter('gform_pre_render', 'populate_cfar_users');
 //Note: when changing drop down values, we also need to use the gform_admin_pre_render so that the right values are displayed when editing the entry.
@@ -137,6 +142,22 @@ function connect_pi_after_submission($entry, $form) {
 }
 
 /**
+* Add Taxonomy / Core selection to the ticket
+*/
+add_action("gform_after_submission_2", "cfar_add_core_taxonomy", 10, 2);
+function cfar_add_core_taxonomy($entry, $form) {
+	$post_id = $entry["post_id"];
+	$selected_core = $entry["79"];
+	$taxonomy = 'type';
+	$cores = get_terms($taxonomy, 'hide_empty=0');
+	foreach($cores as $core) {
+		if($selected_core == $core->slug){
+			wp_set_object_terms( $post_id, $core->slug, $taxonomy );
+		}
+	}
+}
+
+/**
 * Put Post ID number into the post title for the ticket
 */
 add_action("gform_after_submission_2", "cfar_add_post_id_title", 10, 2);
@@ -157,8 +178,9 @@ function cfar_add_post_id_title($entry, $form) {
 	  wp_update_post( $my_post );
 }
 
-
-//Create a Project if they don't have a grant
+/**
+* Create a Project if they don't have a grant
+*/
 add_action("gform_after_submission_2", "cfar_add_project_post", 10, 2);
 function cfar_add_project_post($entry, $form){
 	
