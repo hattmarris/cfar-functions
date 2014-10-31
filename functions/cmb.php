@@ -501,6 +501,16 @@ function cfar_remove_wpas_ticket_attachments() {
 }
 
 /**
+ * Remove the customsidebars-mb metabox from plugin on CFAR staging and production environment
+ */
+add_action( 'add_meta_boxes', 'cfar_remove_customsidebars_mb');
+function cfar_remove_customsidebars_mb() {
+	remove_meta_box( 'customsidebars-mb', 'tickets', 'side' );
+}
+
+
+
+/**
  * Ticket details widget
  *
  * This widget will show basic information about the ticket
