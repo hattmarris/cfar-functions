@@ -9,8 +9,6 @@
  * License: GPL2
  */
  
- //SECOND COMMENT TO TEST PUSH WORKFLOW TO STAGING
- 
  /*  Copyright 2014  Matt Harris  (email : matt@andisites.com)
 
     This program is free software; you can redistribute it and/or modify
@@ -293,8 +291,10 @@ function cfar_export_master_function() {
 								$ticket_meta_list = '';
 								$meta = '';
 								foreach($tickets as $ticket) {
+									$statuses = '';
+									$cores = '';
 									$cores = get_the_terms( $ticket->ID, 'type' );
-									$core = array_pop($cores);
+									if($cores){$core = array_pop($cores);}
 									$statuses = get_the_terms($ticket->ID, 'status');
 									if($statuses) {
 										$status = array_pop($statuses);
