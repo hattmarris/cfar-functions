@@ -485,6 +485,14 @@ function wpas_remove_details_widget() {
 }
 
 /**
+ * Remove the Author metabox for now, since it is already displayed in Ticket Contact -> Requester field
+ */
+add_action( 'add_meta_boxes', 'cfar_remove_author_metabox');
+function cfar_remove_author_metabox() {
+	remove_meta_box( 'authordiv', 'tickets', 'normal' );
+}
+
+/**
  * Ticket details widget
  *
  * This widget will show basic information about the ticket
