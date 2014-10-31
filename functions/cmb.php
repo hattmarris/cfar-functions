@@ -47,7 +47,7 @@ function cfar_service_request_metaboxes( $meta_boxes ) {
         'show_on' => array( 
 			'key' => 'taxonomy', 
 			'value' => array( 
-				'type' => 'clinical-pharmacology',  
+				'core' => 'clinical-pharmacology',  
 			) 
 		), //Show on from taxonomy filter above
         'context' => 'normal',
@@ -113,7 +113,7 @@ function cfar_service_request_metaboxes( $meta_boxes ) {
         'show_on' => array( 
 			'key' => 'taxonomy', 
 			'value' => array( 
-				'type' => 'biostatistics',  
+				'core' => 'biostatistics',  
 			) 
 		), //Show on from taxonomy filter above
         'context' => 'normal',
@@ -180,7 +180,7 @@ function cfar_service_request_metaboxes( $meta_boxes ) {
         'show_on' => array( 
 			'key' => 'taxonomy', 
 			'value' => array( 
-				'type' => 'clinical',  
+				'core' => 'clinical',  
 			) 
 		), //Show on from taxonomy filter above
         'context' => 'normal',
@@ -222,11 +222,11 @@ function cfar_service_request_metaboxes( $meta_boxes ) {
     $args = array(
 	    'hide_empty'        => false,
 	);
-    $types = get_terms('type', $args);
-    foreach($types as $type) {
+    $terms = get_terms('core', $args);
+    foreach($terms as $term) {
     	    $cores[] = array(
-			'name' => $type->name,
-			'value' => $type->slug,
+			'name' => $term->name,
+			'value' => $term->slug,
 		    );
     }
     
@@ -237,7 +237,7 @@ function cfar_service_request_metaboxes( $meta_boxes ) {
         'show_on' => array( 
 			'key' => 'taxonomy', 
 			'value' => array( 
-				'type' => 'developmental',  
+				'core' => 'developmental',  
 			) 
 		), //Show on from taxonomy filter above
         'context' => 'normal',
@@ -293,7 +293,7 @@ function cfar_service_request_metaboxes( $meta_boxes ) {
         'show_on' => array( 
 			'key' => 'taxonomy', 
 			'value' => array( 
-				'type' => 'social-behavorial-science',  
+				'core' => 'social-behavioral-science',  
 			) 
 		), //Show on from taxonomy filter above
         'context' => 'normal',
@@ -414,7 +414,7 @@ function cfar_service_request_metaboxes( $meta_boxes ) {
         'show_on' => array( 
 			'key' => 'taxonomy', 
 			'value' => array( 
-				'type' => 'virology-immunology-microbiology',  
+				'core' => 'virology-immunology-microbiology',  
 			) 
 		), //Show on from taxonomy filter above
         'context' => 'normal',
