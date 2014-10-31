@@ -1,0 +1,133 @@
+<?php
+/**
+* This is where the code for exporting lives 
+*/
+global $plugin_page;
+add_action('admin_init', 'cfar_export_to_table_5');
+function cfar_export_to_table_5() {
+	var_dump('working');
+	if(isset($_POST['submit']) && $_POST['csv'] == 'csv') {
+		cfar_export_to_table_5_csv();
+	}
+	elseif(isset($_POST['submit']) && $_POST['pdf'] == 'pdf') {
+		cfar_export_to_table_5_pdf();
+	} 
+	else {
+		/**
+		* This is the admin page for exporting tickets
+		*/
+		
+		$html = '<div class="wrap"><div id="icon-tools" class="icon32"></div>
+					<h2>Export as Table 5 Report to CSV or PDF</h2>
+				</div>';
+		$html .= '<form action="" method="post" id="export-pdf">
+		<p>
+			<label>
+				<input type="radio" name="csv" value="csv"> CSV
+			</label>
+		</p>
+		<p class="submit">
+			<input type="submit" name="submit" value="Export" class="button button-primary">
+		</p>
+		</form>';
+		echo $html;
+	}
+}
+
+
+function cfar_export_to_table_5_csv() {
+	var_dump('success');	
+	$html = '<h1> Table 5 </h1>';
+
+	$args = array(
+			'post_type' => 'tickets',
+		);
+	
+	$q = new WP_Query( $args );
+	
+	$result[] = '';
+	if ( $q->have_posts() ) {
+		$html .= '<ul>';
+		while ( $q->have_posts() ) {
+			$q->the_post();
+			$title = get_the_title();
+			$html .= '<li>' . $title . '</li>';
+			$result[] = $title; 
+		}
+		$html .= '</ul>';
+	} else {
+		$html .=  'no service request tickets found';
+	}
+	/* Restore original Post Data */
+	wp_reset_postdata();
+	
+	echo $html;
+	
+	downloadCSV($result);
+}
+
+function downloadCSV($result){
+        //$result = mysql_query("SELECT firstName, lastName, city, state, zipcode, phone, datePassed, checkoffDate,isusa FROM users WHERE passed='Y' or checkoffDone='Y'"); 
+        var_dump($result);
+        $output = "";
+        $headers_printed = false;
+
+        //while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+        //{
+            // print out column names as the first row
+            //if(!$headers_printed)
+            //{
+            //	$output .= join(',', array_keys($row)) ."\n";
+            //	$headers_printed = false;
+            //}
+
+            // remove newlines from all the fields and
+            // surround them with quote marks
+            foreach ($result as &$value)
+            {
+                $value = str_replace("\r\n", "", $value);
+                $value = "\"" . $value . "\"";
+            }
+
+            $output .= join(',', $result)."\n";
+
+        //}
+
+        // set the headers
+        $size_in_bytes = strlen($output);
+        header("Content-type: application/vnd.ms-excel");
+        header("Content-disposition:  attachment; filename=export_data.csv; size=$size_in_bytes");
+
+        // send output
+        print $output;
+        exit;
+}
+
+function cfar_export_to_table_5_pdf() {
+		
+	$html = '<h1> Table 5 </h1>';
+
+	$args = array(
+			'post_type' => 'tickets',
+		);
+	
+	$q = new WP_Query( $args );
+	
+	
+	if ( $q->have_posts() ) {
+		$html .= '<ul>';
+		while ( $q->have_posts() ) {
+			$q->the_post();
+			$html .= '<li>' . get_the_title() . '</li>';
+		}
+		$html .= '</ul>';
+	} else {
+		$html .=  'no service request tickets found';
+	}
+	/* Restore original Post Data */
+	wp_reset_postdata();
+	
+	echo $html;
+}
+
+?>
