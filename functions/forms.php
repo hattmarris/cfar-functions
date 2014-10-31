@@ -158,6 +158,43 @@ function cfar_add_core_taxonomy($entry, $form) {
 }
 
 /**
+* Assign Ticket to appropriate user / contact
+*/
+add_action("gform_after_submission_2", "cfar_assign_the_ticket", 10, 2);
+function cfar_assign_the_ticket($entry, $form) {
+	$post_id = $entry["post_id"];
+	$selected_core = $entry["79"];
+	$meta_key = 'wpas_ticket_assignee';
+	$prev_value = get_post_meta($post_id, $meta_key, true);
+	$field = 'email';
+	//Routing based on Core's main contact	- currently settings for testing
+		switch ($selected_core) {
+		    case "biostatistics":
+			$value = 'mattharris89@gmail.com';
+			break;
+		    case "clinical":
+			$value = 'Madison_Hayes@unc.edu';
+			break;
+		    case "clinical-pharmacology":
+			$value = 'dani.leah.strauss@gmail.com';
+			break;
+		    case "developmental":
+			$value = 'mattharris89@gmail.com';
+			break;	
+		    case "social-behavorial-science":
+			$value = 'Madison_Hayes@unc.edu';
+			break;
+		    case "virology-immunology-microbiology":
+			$value = 'dani.leah.strauss@gmail.com';
+			break;			
+		}   
+	$user = get_user_by( $field, $value );	
+	$meta_value = $user->ID;
+	
+	update_post_meta($post_id, $meta_key, $meta_value, $prev_value);
+}
+
+/**
 * Put Post ID number into the post title for the ticket
 */
 add_action("gform_after_submission_2", "cfar_add_post_id_title", 10, 2);
