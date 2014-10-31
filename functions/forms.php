@@ -148,7 +148,7 @@ add_action("gform_after_submission_2", "cfar_add_core_taxonomy", 10, 2);
 function cfar_add_core_taxonomy($entry, $form) {
 	$post_id = $entry["post_id"];
 	$selected_core = $entry["79"];
-	$taxonomy = 'type';
+	$taxonomy = 'core';
 	$cores = get_terms($taxonomy, 'hide_empty=0');
 	foreach($cores as $core) {
 		if($selected_core == $core->slug){
