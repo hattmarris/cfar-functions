@@ -56,6 +56,12 @@ function changeDetailsLabel( $translation, $text ) {
 
 	if( $text == 'Issuer' && $typenow == 'tickets' && isset($_GET['post']) )
 	    return __('Requester', 'wpas');
+        
+    	if( $text == 'Issue' && $typenow == 'tickets' && isset($_GET['post']) )
+	    return __('Request', 'wpas');
+    
+    	if( $text == 'Solve This Issue' && $typenow == 'tickets' && isset($_GET['post']) )
+	    return __('Respond To Request', 'wpas');
     	
     	global $pagenow;
 	if( $pagenow == 'user-edit.php' ) {

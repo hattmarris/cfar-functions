@@ -493,6 +493,14 @@ function cfar_remove_author_metabox() {
 }
 
 /**
+ * Remove the wpas_ticket_attachments metabox for now, attachments seem distracting 
+ */
+add_action( 'add_meta_boxes', 'cfar_remove_wpas_ticket_attachments');
+function cfar_remove_wpas_ticket_attachments() {
+	remove_meta_box( 'wpas_ticket_attachments', 'tickets', 'normal' );
+}
+
+/**
  * Ticket details widget
  *
  * This widget will show basic information about the ticket
