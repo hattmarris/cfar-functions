@@ -226,7 +226,7 @@ function cfar_service_request_metaboxes( $meta_boxes ) {
     foreach($types as $type) {
     	    $cores[] = array(
 			'name' => $type->name,
-			'value' => $type->term_id,
+			'value' => $type->slug,
 		    );
     }
     
