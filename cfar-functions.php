@@ -119,28 +119,28 @@ function mytheme_admin_bar_render() {
 add_action( 'wp_before_admin_bar_render', 'mytheme_admin_bar_render' );
 
 /**
-* This will create a menu item under tickets
+* This will create a menu item under projects
 */
-function cfar_add_tickets_export_menu(){
-	$parent_slug = 'edit.php?post_type=tickets';
+function cfar_add_projects_export_menu(){
+	$parent_slug = 'edit.php?post_type=projects';
 	$page_title = 'Export as Table 5 Report to CSV or PDF';
 	$menu_title = 'Export';
 	$capability = 'export';
-	$menu_slug = 'export-tickets';
-	$function = 'cfar_export_ticket_data';
+	$menu_slug = 'export-projects';
+	$function = 'cfar_export_project_data';
 	add_submenu_page( $parent_slug, $page_title, $menu_title, $capability, $menu_slug, $function );
 }
 // Hook for adding admin menus
-add_action('admin_menu',  'cfar_add_tickets_export_menu');
+add_action('admin_menu',  'cfar_add_projects_export_menu');
 
-function cfar_export_ticket_data() {
-	require_once( CFARF_PATH . 'functions/export/export-tickets-admin.php' );
+function cfar_export_project_data() {
+	require_once( CFARF_PATH . 'functions/export/export-projects-admin.php' );
 }
 
 add_action('admin_init', 'cfar_export_master_function');
 function cfar_export_master_function() {
 	global $plugin_page;
-	if (isset($_POST['submit']) && $plugin_page == 'export-tickets' ) {
+	if (isset($_POST['submit']) && $plugin_page == 'export-projects' ) {
 		if($_POST['type'] == 'csv') {
 			$args = array(
 				'post_type' => 'tickets',
