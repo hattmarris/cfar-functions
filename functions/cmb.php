@@ -509,6 +509,15 @@ function cfar_remove_customsidebars_mb() {
 }
 
 /**
+ * Remove the default core taxonomy metabox so only one value can be selected
+ */
+add_action( 'add_meta_boxes', 'cfar_remove_cores_default_metabox');
+function cfar_remove_cores_default_metabox() {
+	remove_meta_box( 'corediv', 'tickets', 'side' );
+}
+
+
+/**
  * Ticket details widget
  *
  * This widget will show basic information about the ticket
@@ -568,44 +577,73 @@ function cfar_wpas_ticket_details_mb() {
 						?>
 					</select>
 				</td>
+				
+				<td>
+					<?php
+					$count++;
+					$currents = get_the_terms( $post->ID, 'core' );
+
+					$curr_core = '';
+
+					if( is_array($currents) ) {
+						foreach($currents as $current) {
+							$current = $current->slug;
+						}
+						$curr_core = $current;
+					}
+					?>
+					<label for="core"><strong><?php _e('Core', 'cfar'); ?></strong></label>
+					<select name="core" id="core" style="width:100%" required>
+						<?php
+						$cores = get_terms( 'core', array('hide_empty' => 0) );
+						$curr_core = wp_get_object_terms( $post->ID, 'core' );
+						if( is_array($curr_core) && !empty($curr_core) ) {
+							$curr_core = $curr_core[0]->slug;
+						}
+						foreach( $cores as $core ) {
+							?><option value="<?php echo $core->slug; ?>" <?php if( !is_array($curr_core) && $curr_core == $core->slug || !$curr_core && $core->slug == 'biostatistics' ) { echo 'selected="selected"'; } ?>><?php echo $core->name; ?></option><?php
+						}
+						?>
+					</select>
+				</td>
 
 				<?php
 				foreach( $default as $key => $taxonomy ) {
-
-					$tax 		= sanitize_title( $taxonomy['id'] );
-					$terms 		= get_terms( $tax, array( 'hide_empty' => 0 ) );
-					$current 	= wp_get_object_terms( $post->ID, $tax );
-					$single		= '';
-
-					if( is_array( $current ) && !empty( $current ) )
-						$single = $current[0]->slug;
-
-					/* Open a new row */
-					if( 1 == $count )
-						echo '<tr valign="top">';
-
-					?>
-					<td>
-						<label for="<?php echo $tax; ?>"><strong><?php echo ucwords( $tax ); ?></strong></label>
-						<select name="<?php echo $tax; ?>" id="<?php echo $tax; ?>" style="width:100%" <?php if( $taxonomy['required'] ) echo 'required'; ?>><?php
-
-					foreach( $terms as $term ) { ?>
-
-						<option value="<?php echo $term->slug; ?>" <?php if( $single == $term->slug ) { echo 'selected="selected"'; } ?>><?php echo $term->name; ?></option>
-
-					<?php }
-
-					?></select></td><?php
-
-					/* Open a new row */
-					if( 2 == $count ) {
-						echo '</tr>';
-						$count = 0;
+					if($taxonomy['id'] != 'type') {
+						$tax 		= sanitize_title( $taxonomy['id'] );
+						$terms 		= get_terms( $tax, array( 'hide_empty' => 0 ) );
+						$current 	= wp_get_object_terms( $post->ID, $tax );
+						$single		= '';
+	
+						if( is_array( $current ) && !empty( $current ) )
+							$single = $current[0]->slug;
+	
+						/* Open a new row */
+						if( 3 == $count )
+							echo '<tr valign="top">';
+	
+						?>
+						<td>
+							<label for="<?php echo $tax; ?>"><strong><?php echo ucwords( $tax ); ?></strong></label>
+							<select name="<?php echo $tax; ?>" id="<?php echo $tax; ?>" style="width:100%" <?php if( $taxonomy['required'] ) echo 'required'; ?>><?php
+	
+						foreach( $terms as $term ) { ?>
+	
+							<option value="<?php echo $term->slug; ?>" <?php if( $single == $term->slug ) { echo 'selected="selected"'; } ?>><?php echo $term->name; ?></option>
+	
+						<?php }
+	
+						?></select></td><?php
+	
+						/* Open a new row */
+						if( 4 == $count ) {
+							echo '</tr>';
+							$count = 0;
+						}
+	
+						/* Increment the count for row management */
+						$count++;
 					}
-
-					/* Increment the count for row management */
-					$count++;
-
 				}
 
 				if( $count == ( 0 || 1 ) ) {
@@ -681,4 +719,27 @@ function cfar_wpas_ticket_details_mb() {
 		  elseif ( '' == $new_meta_value && $meta_value )
 		    delete_post_meta( $post->ID, $meta_key, $meta_value ); 
 	}
+	
+	add_action( 'save_post', 'cfar_save_core_taxonomy', 9, 2 );
+	/* Save the meta box's post metadata. */
+	function cfar_save_core_taxonomy( $post_id, $post ){
+
+		  /* Verify the nonce before proceeding. 
+		  if ( !isset( $_POST['smashing_post_class_nonce'] ) || !wp_verify_nonce( $_POST['smashing_post_class_nonce'], basename( __FILE__ ) ) )
+		    return $post_id;*/
+		  
+		  /* Get the post type object. */
+		  $post_type = get_post_type_object( $post->post_type );
+		
+		  /* Check if the current user has permission to edit the post. */
+		  if ( !current_user_can( $post_type->cap->edit_post, $post_id ) )
+		    return $post_id;
+		
+		  /* Get the posted data and sanitize it for use. */
+		  $new_core_value = ( isset( $_POST['core'] ) ? sanitize_html_class( $_POST['core'] ) : '' );
+		 
+		  wp_set_object_terms($post_id, $new_core_value, 'core'); 
+	}
+	
+	
 ?>
