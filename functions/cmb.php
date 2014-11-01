@@ -720,7 +720,7 @@ function cfar_wpas_ticket_details_mb() {
 		    delete_post_meta( $post->ID, $meta_key, $meta_value ); 
 	}
 	
-	add_action( 'save_post', 'cfar_save_core_taxonomy', 9, 2 );
+	//add_action( 'save_post', 'cfar_save_core_taxonomy', 9, 2 );
 	/* Save the meta box's post metadata. */
 	function cfar_save_core_taxonomy( $post_id, $post ){
 
