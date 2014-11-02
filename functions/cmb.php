@@ -506,6 +506,7 @@ function cfar_remove_wpas_ticket_attachments() {
 add_action( 'add_meta_boxes', 'cfar_remove_customsidebars_mb', 11);
 function cfar_remove_customsidebars_mb() {
 	remove_meta_box( 'customsidebars-mb', 'tickets', 'side' );
+	remove_meta_box( 'customsidebars-mb', 'projects', 'side' );
 }
 
 /**
@@ -514,6 +515,7 @@ function cfar_remove_customsidebars_mb() {
 add_action( 'add_meta_boxes', 'cfar_remove_cores_default_metabox');
 function cfar_remove_cores_default_metabox() {
 	remove_meta_box( 'corediv', 'tickets', 'side' );
+	remove_meta_box( 'corediv', 'projects', 'side' );
 }
 
 
