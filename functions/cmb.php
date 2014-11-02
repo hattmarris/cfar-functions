@@ -436,6 +436,17 @@ add_filter( 'cmb_meta_boxes', 'cfar_service_request_metaboxes' );
 
 function cfar_projects_metaboxes( $meta_boxes ) {
     $prefix = 'cfar_projects_';
+    
+    $args = array(
+	'hide_empty'        => false,
+	);
+    $terms = get_terms('core', $args);
+    foreach($terms as $term) {
+    	    $cores[] = array(
+			'name' => $term->name,
+			'value' => $term->slug,
+		    );
+    }
 	
     $meta_boxes['project_details_metabox'] = array(    
         'id' => 'project_details_fields_metabox',
@@ -445,6 +456,13 @@ function cfar_projects_metaboxes( $meta_boxes ) {
         'priority' => 'high',
         'show_names' => true, // Show field names on the left
         'fields' => array(
+            array(
+	        'name' => 'Core',
+	        'desc' => 'CFAR Core',
+	        'id' => $prefix . 'core',
+	        'type' => 'select',
+	        'options' => $cores
+	    ),        	
 	    array(
 	        'name' => 'Serial Number',
 	        'desc' => 'Put the NIH serial number here if applicable. The administering organization code will be appended based on your sponsor selection.',
@@ -770,5 +788,23 @@ function cfar_wpas_ticket_details_mb() {
 		  */
 	}
 	
-	
+	add_action('save_post', 'cfar_save_core_taxonomy_projects', 9, 2);
+	function cfar_save_core_taxonomy_projects($post_id, $post) {
+
+		// verify if this is an auto save routine. 
+		// If it is our form has not been submitted, so we dont want to do anything		    
+		if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) || wp_is_post_revision( $post_id ) ) 
+		    return;
+		  
+		/* Get the post type object. */
+		$post_type = get_post_type_object( $post->post_type );
+		
+		/* Check if the current user has permission to edit the post. */
+		if ( !current_user_can( $post_type->cap->edit_post, $post_id ) )
+		  return $post_id;
+	    
+		$core = $_POST['cfar_projects_core'];
+		
+		wp_set_object_terms(  $post_id , $core, 'core' );
+	}	
 ?>
