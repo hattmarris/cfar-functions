@@ -447,6 +447,10 @@ function cfar_projects_metaboxes( $meta_boxes ) {
 			'value' => $term->slug,
 		    );
     }
+    
+    global $post;
+    $terms = wp_get_object_terms( $post->ID, 'core' );
+    $std = $terms[0]->slug;
 	
     $meta_boxes['project_details_metabox'] = array(    
         'id' => 'project_details_fields_metabox',
@@ -459,6 +463,7 @@ function cfar_projects_metaboxes( $meta_boxes ) {
             array(
 	        'name' => 'Core',
 	        'desc' => 'CFAR Core',
+	        'std' => $std,
 	        'id' => $prefix . 'core',
 	        'type' => 'select',
 	        'options' => $cores
