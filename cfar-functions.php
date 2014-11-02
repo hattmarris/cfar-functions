@@ -236,36 +236,21 @@ function cfar_export_master_function() {
 				$children = get_term_children($top_level_sponsor->term_id, $taxonomy_name);
 				foreach($children as $child) {
 					$term = get_term_by( 'id', $child, $taxonomy_name );
-					//var_dump($term->count);
 					if($term->count != 0) {
 						$html .= '<tr><td>'.$term->name.'</td></tr>';
 						/**
 						*  Row is added for the top level sponsor above, then the query is run based on projects associated with that sponsor
 						*  
 						*  $core variable for querying projects only from a certain core, was set by $_POST['core']
+						*  (If core is 'all' the query is set as null value)
+						*
 						*/
-						/*if($core == 'all'){
-							$terms = get_terms('core', 'hide_empty=0');
-							//$cores = array();
-							foreach($terms as $term) {
-								$cores[] = $term->slug;							
-							}
-						} else {
-							$cores = $core;
-						}*/
-						//var_dump($cores);
-						//wp_die();
+						if($core == 'all'){$core = null;}
 						$args = array(
 							'post_type' => 'projects',
 							'order' => 'ASC',
 							'sponsor' => $term->name,
-							'tax_query' => array(
-								array(
-									'taxonomy' => 'core',
-									'field'    => 'slug',
-									'terms'    => array('developmental', 'biostatistics'),
-								),
-							),
+							'core' => $core
 						);
 						$q = new WP_Query( $args );
 						if ( $q->have_posts() ) {
