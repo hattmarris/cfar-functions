@@ -591,6 +591,8 @@ function cfar_wpas_ticket_details_mb() {
 						}
 						$curr_core = $current;
 					}
+					// Use nonce for verification
+					wp_nonce_field( plugin_basename( __FILE__ ), 'core_noncename' );
 					?>
 					<label for="core"><strong><?php _e('Core', 'cfar'); ?></strong></label>
 					<select name="core" id="core" style="width:100%" required>
@@ -720,13 +722,17 @@ function cfar_wpas_ticket_details_mb() {
 		    delete_post_meta( $post->ID, $meta_key, $meta_value ); 
 	}
 	
-	//add_action( 'save_post', 'cfar_save_core_taxonomy', 9, 2 );
+	add_action( 'save_post', 'cfar_save_core_taxonomy', 9, 2 );
 	/* Save the meta box's post metadata. */
 	function cfar_save_core_taxonomy( $post_id, $post ){
 
-		  /* Verify the nonce before proceeding. 
-		  if ( !isset( $_POST['smashing_post_class_nonce'] ) || !wp_verify_nonce( $_POST['smashing_post_class_nonce'], basename( __FILE__ ) ) )
-		    return $post_id;*/
+		  if ( !wp_verify_nonce( $_POST['core_noncename'], plugin_basename( __FILE__ ) ) )
+		      return;
+		    
+		  // verify if this is an auto save routine. 
+		  // If it is our form has not been submitted, so we dont want to do anything		    
+		  if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) || wp_is_post_revision( $post_id ) ) 
+		      return;
 		  
 		  /* Get the post type object. */
 		  $post_type = get_post_type_object( $post->post_type );
@@ -734,11 +740,32 @@ function cfar_wpas_ticket_details_mb() {
 		  /* Check if the current user has permission to edit the post. */
 		  if ( !current_user_can( $post_type->cap->edit_post, $post_id ) )
 		    return $post_id;
+	    
+	    	  $core = $_POST['core'];
+	    	  
+	    	  wp_set_object_terms(  $post_id , $core, 'core' );
+	    	  
+	    	  
+	    	  //Leaving commented code block for now... issue: meta information is wiped by wp_set_object_terms() when new core is selected. Ultimately may not be a problem. 
 		
-		  /* Get the posted data and sanitize it for use. */
+		  /* Get the posted data and sanitize it for use. 
 		  $new_core_value = ( isset( $_POST['core'] ) ? sanitize_html_class( $_POST['core'] ) : '' );
-		 
-		  wp_set_object_terms($post_id, $new_core_value, 'core'); 
+		  
+		  $core = get_the_terms($post_id, 'core');
+		  
+		  $core = $core[0]->slug;
+		  
+		  /* If a new core value was added and there was no previous value, set it. 
+		  if ( $new_core_value && '' == $core ) {
+		    wp_set_object_terms($post_id, $new_core_value, 'core', true);
+		    wp_remove_object_terms( $post_id, $core, 'core' );
+	          }
+		  /* If the new core value does not match the old value, set it. 
+		  elseif ( $new_core_value && $new_core_value != $core ) {
+		    wp_set_object_terms($post_id, $new_core_value, 'core', true);
+	   	    wp_remove_object_terms( $post_id, $core, 'core' );
+		  }
+		  */
 	}
 	
 	
