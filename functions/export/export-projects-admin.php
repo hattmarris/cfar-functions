@@ -11,9 +11,10 @@ $html .= '<h3>Core:</h3>';
 $html .= '<p><ul>';
 
 /**
-* Dynamically add Cores as radio options
+* Dynamically add Cores as radio options - and option for all
 */
 
+$html .= '<li><label><input type="radio" name="core" value="all"> All </label></li>';
 $cores = get_terms( 'core', 'hide_empty=0' );
 foreach($cores as $core){
 	$html .= '<li><label>
