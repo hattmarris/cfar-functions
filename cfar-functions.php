@@ -203,6 +203,9 @@ function cfar_export_master_function() {
 			print $output;
 			exit;
 		}
+		/**
+		* Beging PDF export Query block
+		*/
 		if($_POST['type'] == 'pdf') {
 			$html = '<body style="font-family: arial, sans-serif; font-size: 10pt;">';
 			/*$html .= '<table><htmlpageheader name="header">';
@@ -240,12 +243,29 @@ function cfar_export_master_function() {
 						*  Row is added for the top level sponsor above, then the query is run based on projects associated with that sponsor
 						*  
 						*  $core variable for querying projects only from a certain core, was set by $_POST['core']
-						*/				
+						*/
+						/*if($core == 'all'){
+							$terms = get_terms('core', 'hide_empty=0');
+							//$cores = array();
+							foreach($terms as $term) {
+								$cores[] = $term->slug;							
+							}
+						} else {
+							$cores = $core;
+						}*/
+						//var_dump($cores);
+						//wp_die();
 						$args = array(
 							'post_type' => 'projects',
 							'order' => 'ASC',
-							'core' => $core,
-							'sponsor' => $term->name
+							'sponsor' => $term->name,
+							'tax_query' => array(
+								array(
+									'taxonomy' => 'core',
+									'field'    => 'slug',
+									'terms'    => array('developmental', 'biostatistics'),
+								),
+							),
 						);
 						$q = new WP_Query( $args );
 						if ( $q->have_posts() ) {
