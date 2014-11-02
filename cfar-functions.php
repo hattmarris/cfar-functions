@@ -140,6 +140,7 @@ function cfar_export_project_data() {
 add_action('admin_init', 'cfar_export_master_function');
 function cfar_export_master_function() {
 	global $plugin_page;
+	$core = $_POST['core'];
 	if (isset($_POST['submit']) && $plugin_page == 'export-projects' ) {
 		if($_POST['type'] == 'csv') {
 			$args = array(
@@ -236,11 +237,14 @@ function cfar_export_master_function() {
 					if($term->count != 0) {
 						$html .= '<tr><td>'.$term->name.'</td></tr>';
 						/**
-						*  Row is added for the top level sponsor above, then the wuery is run based on projects associated with that sponsor
+						*  Row is added for the top level sponsor above, then the query is run based on projects associated with that sponsor
+						*  
+						*  $core variable for querying projects only from a certain core, was set by $_POST['core']
 						*/				
 						$args = array(
 							'post_type' => 'projects',
 							'order' => 'ASC',
+							'core' => $core,
 							'sponsor' => $term->name
 						);
 						$q = new WP_Query( $args );
