@@ -14,7 +14,7 @@ $html .= '<p><ul>';
 * Dynamically add Cores as radio options - and option for all
 */
 
-$html .= '<li><label><input type="radio" name="core" value="all"> All </label></li>';
+$html .= '<li><label><input type="radio" name="core" value="all">All </label></li>';
 $cores = get_terms( 'core', 'hide_empty=0' );
 foreach($cores as $core){
 	$html .= '<li><label>
@@ -31,10 +31,10 @@ $html .= '<h3>Format:</h3>';
 $html .=
 '<p>
 	<label>
-		<input type="radio" name="type" value="csv"> CSV
+		<input type="radio" name="type" value="csv">CSV
 	</label>
 	<label>
-		<input type="radio" name="type" value="pdf"> PDF
+		<input type="radio" name="type" value="pdf">PDF
 	</label>
 </p>
 <p class="submit">

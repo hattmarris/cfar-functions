@@ -65,7 +65,7 @@ remove_role('helpdesk');
 $val = get_option( 'wp_user_roles' );
 $val['wpas_manager']['name'] = 'Staff';
 update_option( 'wp_user_roles', $val );
-$val['wpas_support_manager']['name'] = 'Principal Investigator';
+$val['wpas_support_manager']['name'] = 'WPAS Support Manager';
 update_option( 'wp_user_roles', $val );
 $val['wpas_agent']['name'] = 'Core Administrators';
 update_option( 'wp_user_roles', $val );

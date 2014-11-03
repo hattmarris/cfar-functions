@@ -15,9 +15,9 @@ function populate_cfar_users($form) {
 	if($form["id"] != 2)
 	      return $form;
 	
-	//Reading users, then users with pi role (wpas_support_manager) in ticketing system      
+	//Reading users, then users with pi role (principal_investigator) in ticketing system      
 	$users = get_users();
-	$pis = get_users('role=wpas_support_manager');
+	$pis = get_users('role=principal_investigator');
 
 	//Creating drop down item arrays.
 	$choices = array();

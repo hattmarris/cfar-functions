@@ -45,7 +45,7 @@
 /**
 * Adding Shared Cores Taxonomy for tickets and projects
 */
-add_action('init', 'cfar_add_core_tickets_projects_taxonomy');
+add_action('init', 'cfar_add_core_tickets_projects_taxonomy', 1);
 if ( !function_exists('cfar_add_core_tickets_projects_taxonomy') ) {
 	function cfar_add_core_tickets_projects_taxonomy() {
 			/******* Ticket / Project Core Post Taxonomy *******/

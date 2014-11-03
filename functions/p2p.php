@@ -11,7 +11,7 @@ function cfar_p2p_connection_types() {
 		    'values' => array( 'Investigator', 'Collaborator' )
 		),
 	    ),
-	    'to_query_vars' => array( 'role' => 'wpas_support_manager' ),
+	    'to_query_vars' => array( 'role' => 'principal_investigator' ),
 	    'title' => array(
 		    'from' => __( 'Principal Investigator(s)', 'cfar-functions' ),
 		    'to' => __( 'Project', 'cfar-functions' )
@@ -21,7 +21,7 @@ function cfar_p2p_connection_types() {
 	    'name' => 'tickets_to_pis',
 	    'from' => 'tickets',
 	    'to' => 'user',
-	    'to_query_vars' => array( 'role' => 'wpas_support_manager' ),
+	    'to_query_vars' => array( 'role' => 'principal_investigator' ),
 	    'title' => array(
 		    'from' => __( 'Principal Investigator', 'cfar-functions' ),
 		    'to' => __( 'Ticket', 'cfar-functions' )
