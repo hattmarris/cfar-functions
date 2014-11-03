@@ -42,6 +42,15 @@
 * Removing the Types Taxonomy in favor of Shared Cores Functionality
 */
 
+add_action( 'init', 'cfar_unregister_wpas_types_taxonomy', 9999 );
+function cfar_unregister_wpas_types_taxonomy()
+{
+    global $wp_taxonomies;
+    $taxonomy = 'type';
+    if ( taxonomy_exists($taxonomy) )
+        unset( $wp_taxonomies[$taxonomy] );
+}
+
 /**
 * Adding Shared Cores Taxonomy for tickets and projects
 */
