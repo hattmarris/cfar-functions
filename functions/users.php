@@ -12,6 +12,7 @@ function cfar_add_roles_on_plugin_activation() {
 	    'principal_investigator',
 	    __( 'Principal Investigator' ),
 	    array(
+	    	'level_0' => true,    
 		'read'         => true,  // true allows this capability
 		'view_ticket'   => true,
 		'reply_ticket' => true, // false can be used to explicitly deny
