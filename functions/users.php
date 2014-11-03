@@ -23,12 +23,39 @@ function cfar_add_roles_on_plugin_activation() {
 	else {
 	    echo 'Oh... the principal_investigator role already exists.';
 	}
+	
+	$result = add_role(
+	    'basic_user',
+	    __( 'Basic User' ),
+	    array(
+	    	'level_0' => true,    
+		'read'         => true,  // true allows this capability
+		'view_ticket'   => true,
+		'reply_ticket' => true, // false can be used to explicitly deny
+	    )
+	);
+	if ( null !== $result ) {
+	    echo 'Basic User role created!';
+	}
+	else {
+	    echo 'Oh... the Basic User role already exists.';
+	}
 }
 function cfar_remove_roles_on_plugin_deactivation() {
 	remove_role( 'principal_investigator' );
+	remove_role( 'basic_user' );
 }
 register_activation_hook( __FILE__, 'cfar_add_roles_on_plugin_activation' );
 register_deactivation_hook(__FILE__, 'cfar_remove_roles_on_plugin_deactivation');
+
+/* Add Caps Programmatically
+function add_plugin_caps() {
+    $role = get_role( 'principal_investigator' );
+    $role->add_cap( 'level_0' ); 
+}
+add_action( 'admin_init', 'add_plugin_caps');
+*/
+
 
 //Temporarily Clean  WPHelpdesk User Role that was created for development version of plugin
 remove_role('helpdesk');
@@ -42,7 +69,7 @@ update_option( 'wp_user_roles', $val );
 $val['wpas_agent']['name'] = 'Core Administrators';
 update_option( 'wp_user_roles', $val );
 //Change the rather useless "Subscriber" role to be labeled "Basic User"
-$val['subscriber']['name'] = 'Basic User';
+$val['subscriber']['name'] = 'Subscriber';
 update_option( 'wp_user_roles', $val );
 
 //Begin customizing the Profile Page
