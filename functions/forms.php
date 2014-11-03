@@ -242,6 +242,11 @@ function cfar_add_project_post($entry, $form){
 		p2p_type( 'projects_to_pis' )->connect( $project, $pi, array(
 		    'date' => current_time('mysql')
 		) );
+		
+		//add the core taxonomy to the project
+		$selected_core = $entry["79"];
+		$taxonomy = 'core';
+		wp_set_object_terms( $project, $selected_core, $taxonomy );
 	}
 }
 
