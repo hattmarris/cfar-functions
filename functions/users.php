@@ -1,4 +1,34 @@
 <?php
+/**
+*  File for User functions
+*
+*/
+
+/**
+*  Create new user roles, first without activation hook - then on activation for future use
+*/
+function cfar_add_roles_on_plugin_activation() {
+	$result = add_role(
+	    'principal_investigator',
+	    __( 'Principal Investigator' ),
+	    array(
+		'read'         => true,  // true allows this capability
+		'view_ticket'   => true,
+		'reply_ticket' => true, // false can be used to explicitly deny
+	    )
+	);
+	if ( null !== $result ) {
+	    echo 'Principal Investigator role created!';
+	}
+	else {
+	    echo 'Oh... the principal_investigator role already exists.';
+	}
+}
+function cfar_remove_roles_on_plugin_deactivation() {
+	remove_role( 'principal_investigator' );
+}
+register_activation_hook( __FILE__, 'cfar_add_roles_on_plugin_activation' );
+register_deactivation_hook(__FILE__, 'cfar_remove_roles_on_plugin_deactivation');
 
 //Temporarily Clean  WPHelpdesk User Role that was created for development version of plugin
 remove_role('helpdesk');
