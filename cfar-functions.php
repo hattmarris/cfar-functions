@@ -9,8 +9,6 @@
  * License: GPL2
  */
  
- //TEST COMMENT FOR PUSH TO STAGING AGAIN
- 
  /*  Copyright 2014  Matt Harris  (email : matt@andisites.com)
 
     This program is free software; you can redistribute it and/or modify
