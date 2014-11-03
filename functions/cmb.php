@@ -740,11 +740,7 @@ function cfar_wpas_ticket_details_mb() {
 		
 		  /* If the new meta value does not match the old value, update it. */
 		  elseif ( $new_meta_value && $new_meta_value != $meta_value )
-		    update_post_meta( $post->ID, $meta_key, $new_meta_value );
-		
-		  /* If there is no new meta value but an old value exists, delete it. */
-		  elseif ( '' == $new_meta_value && $meta_value )
-		    delete_post_meta( $post->ID, $meta_key, $meta_value ); 
+		    update_post_meta( $post->ID, $meta_key, $new_meta_value ); 
 	}
 	
 	add_action( 'save_post', 'cfar_save_core_taxonomy', 9, 2 );
