@@ -470,7 +470,7 @@ function cfar_add_specific_date($entry, $form) {
 	
 	//get date from form
 	$specific_date = $entry["9"];
-	
+
 	if (!empty($specific_date)) {
 		add_post_meta($ticket->ID, 'cfar_specific_date', $specific_date, true);
 	}

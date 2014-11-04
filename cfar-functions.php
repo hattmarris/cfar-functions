@@ -119,7 +119,86 @@ function mytheme_admin_bar_render() {
 add_action( 'wp_before_admin_bar_render', 'mytheme_admin_bar_render' );
 
 /**
-* This will create a menu item under projects
+* This will create a menu item under projects for import
+*/
+function cfar_add_projects_import_menu(){
+	$parent_slug = 'edit.php?post_type=projects';
+	$page_title = 'Import Projects';
+	$menu_title = 'Import';
+	$capability = 'import';
+	$menu_slug = 'import-projects';
+	$function = 'cfar_import_project_data';
+	add_submenu_page( $parent_slug, $page_title, $menu_title, $capability, $menu_slug, $function );
+}
+add_action('admin_menu',  'cfar_add_projects_import_menu');
+
+function cfar_import_project_data() {
+	require_once( CFARF_PATH . 'functions/import/import-projects-admin.php' );
+}
+/**
+* Import CSV function
+*/
+add_action('admin_init', 'cfar_import_master_function');
+function cfar_import_master_function() {
+	global $plugin_page;
+	$core_id = $_POST['csv_importer_core'];
+	$log = array();
+	if (isset($_POST['submit']) && $plugin_page == 'import-projects' ) {
+		$core = get_term($core_id, 'core');
+		if (empty($_FILES['csv_import']['tmp_name'])) {
+			$log['error'][] = 'No file uploaded, aborting.';
+			cfar_print_log_messages($log);
+			return;
+		}
+		if (!current_user_can('publish_pages') || !current_user_can('publish_posts')) {
+			$log['error'][] = 'You don\'t have the permissions to publish posts and pages. Please contact the blog\'s administrator.';
+			cfar_print_log_messages($log);
+			return;
+		}
+		//$csv = array_map('str_getcsv', file('data.csv'));
+	}
+}
+
+function cfar_print_log_messages($log) {
+        if (!empty($log)) {
+
+        // messages HTML {{{
+?>
+
+    <?php if (!empty($log['error'])): ?>
+
+    <div class="error">
+
+        <?php foreach ($log['error'] as $error): ?>
+            <p><?php echo $error; ?></p>
+        <?php endforeach; ?>
+
+    </div>
+
+    <?php endif; ?>
+
+    <?php if (!empty($log->log['notice'])): ?>
+
+    <div class="updated fade">
+
+        <?php foreach ($log['notice'] as $notice): ?>
+            <p><?php echo $notice; ?></p>
+        <?php endforeach; ?>
+
+    </div>
+
+    <?php endif; ?>
+
+<?php
+        // end messages HTML }}}
+
+            $log = array();
+       }
+}
+
+
+/**
+* This will create a menu item under projects for export
 */
 function cfar_add_projects_export_menu(){
 	$parent_slug = 'edit.php?post_type=projects';
