@@ -161,9 +161,7 @@ function cfar_remove_roles_on_plugin_deactivation() {
 register_activation_hook( __FILE__, 'cfar_add_roles_on_plugin_activation' );
 register_deactivation_hook(__FILE__, 'cfar_remove_roles_on_plugin_deactivation');
 
-//Temporarily Clean  WPHelpdesk User Role that was created for development version of plugin
-remove_role('helpdesk');
-
+/* OLD METHOD - to change value of wp_user_roles option in wp_options table
 //Changes the labels ($display_names) for the roles created by the WP Awesome Support Plugin
 $val = get_option( 'wp_user_roles' );
 $val['wpas_manager']['name'] = 'WPAS Manager';
@@ -175,6 +173,16 @@ update_option( 'wp_user_roles', $val );
 //Change the rather useless "Subscriber" role to be labeled "Basic User"
 $val['subscriber']['name'] = 'Subscriber';
 update_option( 'wp_user_roles', $val );
+*/
+/**
+*  Remove User Roles added by WPAS and other plugins
+*/
+add_action( 'init', 'cfar_remove_wpas_user_roles');
+function cfar_remove_wpas_user_roles() {
+	remove_role('wpas_agent');
+	remove_role('wpas_manager');
+	remove_role('wpas_support_manager');
+}
 
 //Begin customizing the Profile Page
 add_action( 'show_user_profile', 'my_show_extra_profile_fields' );
