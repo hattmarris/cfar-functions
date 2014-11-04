@@ -187,11 +187,31 @@ function cfar_remove_wpas_user_roles() {
 //Begin customizing the Profile Page
 add_action( 'show_user_profile', 'my_show_extra_profile_fields' );
 add_action( 'edit_user_profile', 'my_show_extra_profile_fields' );
-function my_show_extra_profile_fields( $user ) { ?>
+function my_show_extra_profile_fields( $user ) { 
+		if( !current_user_can( 'administrator' ) )
+			return;
+	$val 	= get_user_meta( $user->ID, 'cfar_core', true );
+	$groups = get_terms( 'core', array('hide_empty' => 0) );
+	?>
 
 	<h3>CFAR Profile Information</h3>
 
 	<table class="form-table">
+		<tr>
+			<th>
+				<label for="cfar_core"><?php _e('User\'s Core', 'cfar'); ?></label>
+			</th>
+			<td>
+				<select name="cfar_core" id="cfar_core">
+					<option value="" <?php if( $val == '' ) { echo ' selected="selected"'; } ?> disabled="disabled"><?php _e('None', 'cfar'); ?></option>
+					<?php
+					foreach( $groups as $group => $vars ) {
+						?><option value="<?php echo $vars->slug; ?>" <?php if( $val == $vars->slug ) echo ' selected="selected"'; ?>><?php echo $vars->name; ?></option><?php
+					}
+					?>
+				</select>
+			</td>
+		</tr>		
 		
 		<tr>
 			<th><label>Address</label></th>
@@ -346,6 +366,7 @@ function my_save_extra_profile_fields( $user_id ) {
 		return false;
 
 	/* Copy and paste this line for additional fields. Make sure to change 'twitter' to the field ID. */
+	update_user_meta( $user_id, 'cfar_core', $_POST['cfar_core'] );
 	update_user_meta( $user_id, 'address_street', $_POST['address_street'] );
 	update_user_meta( $user_id, 'address_line_2', $_POST['address_line_2'] );
 	update_user_meta( $user_id, 'address_city', $_POST['address_city'] );
@@ -363,26 +384,44 @@ function my_save_extra_profile_fields( $user_id ) {
 }
 //Add Extra User Columns to All Users Screen
 function add_extra_user_columns( $defaults ) {
+    $defaults['mysite-usercolumn-core'] = __('Core', 'core');
     $defaults['mysite-usercolumn-phone'] = __('Phone', 'phone');
     //$defaults['mysite-usercolumn-address-full'] = __('Full Address', 'address_full');
-    //$defaults['mysite-usercolumn-hiv-interest'] = __('HIV Interest', 'hiv_interest');
-    //$defaults['mysite-usercolumn-otherfield2'] = __('Other field 2', 'user-column');
     return $defaults;
 }
 function mysite_custom_column_company($value, $column_name, $id) {
    if( $column_name == 'mysite-usercolumn-phone' ) {
         return get_the_author_meta( 'phone', $id );
     } 
-   /*elseif( $column_name == 'mysite-usercolumn-address-full' ) {
-        return get_the_author_meta( 'address_full', $id );
+    elseif($column_name == 'mysite-usercolumn-core'){
+    	    $slug = get_the_author_meta( 'cfar_core', $id );
+    	    $core = get_term_by('slug', $slug, 'core');
+    	    return $core->name;
     }
-    elseif( $column_name == 'mysite-usercolumn-hiv-interest' ) {
-        return get_the_author_meta( 'hiv_interest', $id );
-    }
-    elseif( $column_name == 'mysite-usercolumn-otherfield2' ) {
-        return get_the_author_meta( 'otherfield2', $id );
-    }*/
 }
 add_action('manage_users_custom_column', 'mysite_custom_column_company', 15, 3);
 add_filter('manage_users_columns' , 'add_extra_user_columns', 15, 1);
+
+/**
+ * Remove Custom fields in user profile from WPAS
+ *
+ * We need to hook those function in a separate function
+ * as user_can cannot be loaded too early. We have to call
+ * this function on the init hook for it to work.
+ */
+add_action('init', 'cfar_removeUserCustomFields' );
+function cfar_removeUserCustomFields() {
+global $wpas;
+	if( isset( $_GET['user_id'] ) && current_user_can( 'administrator' ) ) {
+
+		remove_action( 'show_user_profile', array( $wpas, 'UserProfileFields' ) );
+		remove_action( 'edit_user_profile', array( $wpas, 'UserProfileFields' ) );
+
+	}
+
+	remove_action( 'profile_personal_options', array( $wpas, 'UserProfileFields' ) );
+	remove_action( 'personal_options_update', array( $wpas, 'SaveUserProfileFields' ) );
+	remove_action( 'edit_user_profile_update', array( $wpas, 'SaveUserProfileFields' ) );
+
+}
 ?>
