@@ -41,13 +41,252 @@ function cfar_add_roles_on_plugin_activation() {
 	else {
 	    echo 'Oh... the Basic User role already exists.';
 	}
+
+	$result = add_role(
+	    'staff',
+	    __( 'Staff' ),
+	    array(
+	    	'level_0' => true,    
+		'close_ticket'         => true,  // true allows this capability
+		'delete_published_posts'   => true,
+		'edit_published_posts' => true, // false can be used to explicitly deny
+		'read' => true,
+		'view_ticket' => true,
+		'edit_ticket' => true,
+		'reply_ticket' => true,
+		'assign_ticket' => true,
+		'create_ticket' => true,
+		'delete_posts' => true,
+		'edit_posts' => true,
+		'publish_posts' => true,
+		'upload_files' => true
+	    )
+	);
+	if ( null !== $result ) {
+	    echo 'Staff role created!';
+	}
+	else {
+	    echo 'Oh... the Staff role already exists.';
+	}
+	
+	$result = add_role(
+	    'staff',
+	    __( 'Staff' ),
+	    array(
+	    	'level_0' => true,
+	    	'level_1' => true,    
+	    	'level_2' => true,    	    	
+		'close_ticket'         => true,  // true allows this capability
+		'delete_published_posts'   => true,
+		'edit_published_posts' => true, // false can be used to explicitly deny
+		'read' => true,
+		'view_ticket' => true,
+		'edit_ticket' => true,
+		'reply_ticket' => true,
+		'assign_ticket' => true,
+		'create_ticket' => true,
+		'delete_posts' => true,
+		'edit_posts' => true,
+		'publish_posts' => true,
+		'upload_files' => true
+	    )
+	);
+	if ( null !== $result ) {
+	    echo 'Staff role created!';
+	}
+	else {
+	    echo 'Oh... the Staff role already exists.';
+	}
+	
+		$result = add_role(
+	    'core_administrator',
+	    __( 'Core Administrator' ),
+	    array(
+	    	'level_0' => true,
+	    	'level_1' => true,    
+	    	'level_2' => true,
+		'level_3' => true,    	    	
+		'close_ticket'         => true,  // true allows this capability
+		'delete_pages'         => true,
+		'delete_private_pages'         => true,
+		'delete_published_posts'   => true,
+		'delete_ticket'         => true,
+		'edit_published_posts' => true, // false can be used to explicitly deny
+		'edit_pages' => true,
+		'edit_private_pages' => true,
+		'read' => true,
+		'settings_tickets' => true,
+		'unfiltered_html' => true,
+		'delete_others_pages' => true,
+		'delete_private_posts' => true,
+		'edit_others_pages' => true,
+		'edit_private_posts' => true,
+		'manage_categories' => true,
+		'manage_tickets' => true,
+		'publish_pages' => true,
+		'read_private_pages' => true,
+		'view_ticket' => true,
+		'edit_ticket' => true,
+		'reply_ticket' => true,
+		'delete_others_posts' => true,
+		'delete_published_pages'   => true,
+		'edit_others_posts' => true,
+		'edit_others_pages' => true,
+		'edit_posts' => true,
+		'assign_ticket' => true,
+		'create_ticket' => true,
+		'delete_posts' => true,
+		'edit_posts' => true,
+		'publish_posts' => true,
+		'upload_files' => true,
+		'manage_links' => true,
+		'moderate_comments' => true,
+		'read_private_posts' => true,
+		'ticket_taxonomy' => true,		
+	    )
+	);
+	if ( null !== $result ) {
+	    echo 'Core Administrator role created!';
+	}
+	else {
+	    echo 'Oh... the Core Administrator role already exists.';
+	}
 }
 function cfar_remove_roles_on_plugin_deactivation() {
 	remove_role( 'principal_investigator' );
 	remove_role( 'basic_user' );
+	remove_role( 'staff' );
+	remove_role( 'core_administrator' );
 }
 register_activation_hook( __FILE__, 'cfar_add_roles_on_plugin_activation' );
 register_deactivation_hook(__FILE__, 'cfar_remove_roles_on_plugin_deactivation');
+
+$result = add_role(
+	    'basic_user',
+	    __( 'Basic User' ),
+	    array(
+	    	'level_0' => true,    
+		'read'         => true,  // true allows this capability
+		'view_ticket'   => true,
+		'reply_ticket' => true, // false can be used to explicitly deny
+	    )
+	);
+	if ( null !== $result ) {
+	    echo 'Basic User role created!';
+	}
+	else {
+	    echo 'Oh... the Basic User role already exists.';
+	}
+
+	$result = add_role(
+	    'staff',
+	    __( 'Staff' ),
+	    array(
+	    	'level_0' => true,    
+		'close_ticket'         => true,  // true allows this capability
+		'delete_published_posts'   => true,
+		'edit_published_posts' => true, // false can be used to explicitly deny
+		'read' => true,
+		'view_ticket' => true,
+		'edit_ticket' => true,
+		'reply_ticket' => true,
+		'assign_ticket' => true,
+		'create_ticket' => true,
+		'delete_posts' => true,
+		'edit_posts' => true,
+		'publish_posts' => true,
+		'upload_files' => true
+	    )
+	);
+	if ( null !== $result ) {
+	    echo 'Staff role created!';
+	}
+	else {
+	    echo 'Oh... the Staff role already exists.';
+	}
+	
+	$result = add_role(
+	    'staff',
+	    __( 'Staff' ),
+	    array(
+	    	'level_0' => true,
+	    	'level_1' => true,    
+	    	'level_2' => true,    	    	
+		'close_ticket'         => true,  // true allows this capability
+		'delete_published_posts'   => true,
+		'edit_published_posts' => true, // false can be used to explicitly deny
+		'read' => true,
+		'view_ticket' => true,
+		'edit_ticket' => true,
+		'reply_ticket' => true,
+		'assign_ticket' => true,
+		'create_ticket' => true,
+		'delete_posts' => true,
+		'edit_posts' => true,
+		'publish_posts' => true,
+		'upload_files' => true
+	    )
+	);
+	if ( null !== $result ) {
+	    echo 'Staff role created!';
+	}
+	else {
+	    echo 'Oh... the Staff role already exists.';
+	}
+	
+		$result = add_role(
+	    'core_administrator',
+	    __( 'Core Administrator' ),
+	    array(
+	    	'level_0' => true,
+	    	'level_1' => true,    
+	    	'level_2' => true,
+		'level_3' => true,    	    	
+		'close_ticket'         => true,  // true allows this capability
+		'delete_pages'         => true,
+		'delete_private_pages'         => true,
+		'delete_published_posts'   => true,
+		'delete_ticket'         => true,
+		'edit_published_posts' => true, // false can be used to explicitly deny
+		'edit_pages' => true,
+		'edit_private_pages' => true,
+		'read' => true,
+		'settings_tickets' => true,
+		'unfiltered_html' => true,
+		'delete_others_pages' => true,
+		'delete_private_posts' => true,
+		'edit_others_pages' => true,
+		'edit_private_posts' => true,
+		'manage_categories' => true,
+		'manage_tickets' => true,
+		'publish_pages' => true,
+		'read_private_pages' => true,
+		'view_ticket' => true,
+		'edit_ticket' => true,
+		'reply_ticket' => true,
+		'delete_others_posts' => true,
+		'delete_published_pages'   => true,
+		'edit_others_posts' => true,
+		'edit_others_pages' => true,
+		'edit_posts' => true,
+		'assign_ticket' => true,
+		'create_ticket' => true,
+		'delete_posts' => true,
+		'edit_posts' => true,
+		'publish_posts' => true,
+		'upload_files' => true,
+		'manage_links' => true,
+		'moderate_comments' => true,
+		'read_private_posts' => true,
+		'ticket_taxonomy' => true,		
+	    )
+	);
+	if ( null !== $result ) {
+	    echo 'Core Administrator role created!';
+	}
+	else {
+	    echo 'Oh... the Core Administrator role already exists.';
+	}
 
 /* Add Caps Programmatically
 function add_plugin_caps() {
@@ -63,11 +302,11 @@ remove_role('helpdesk');
 
 //Changes the labels ($display_names) for the roles created by the WP Awesome Support Plugin
 $val = get_option( 'wp_user_roles' );
-$val['wpas_manager']['name'] = 'Staff';
+$val['wpas_manager']['name'] = 'WPAS Manager';
 update_option( 'wp_user_roles', $val );
 $val['wpas_support_manager']['name'] = 'WPAS Support Manager';
 update_option( 'wp_user_roles', $val );
-$val['wpas_agent']['name'] = 'Core Administrators';
+$val['wpas_agent']['name'] = 'WPAS Agent';
 update_option( 'wp_user_roles', $val );
 //Change the rather useless "Subscriber" role to be labeled "Basic User"
 $val['subscriber']['name'] = 'Subscriber';
