@@ -189,7 +189,9 @@ function cfar_import_master_function() {
 			$notes_award_title = $data[20];
 			$percent_effort = $data[21]; //21 because array starts at 0 (count shows 22 columns)
 			
-			cfar_csv_create_user($core, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $user_name, $user_phone, $user_email);
+			$date = gmdate("Y-m-d H:i:s", $timestamp);			
+			
+			cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $user_name, $user_phone, $user_email, $project_title, $project_description);
 				   
 			/*//Print all the data for inspection
 			for ($c=0; $c < $num; $c++) {
@@ -204,7 +206,7 @@ function cfar_import_master_function() {
 	}
 }
 
-function cfar_csv_create_user($core, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $user_name, $user_phone, $user_email) {
+function cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $user_name, $user_phone, $user_email, $project_title, $project_description) {
        if ( username_exists( $user_name ) ) {
 	   $log['error'][] = "Username: ".$user_name." already in use. Check and fix row: " . $row . " of .csv file to upload user.";
 	   cfar_print_log_messages($log);
@@ -224,6 +226,25 @@ function cfar_csv_create_user($core, $row, $pi_name, $pi_phone, $pi_email, $pi_o
 	       update_user_meta( $user_id, 'cfar_core', $core );
 	       $log['notice'][] = 'User '.$user_name.' created with password: '.$random_password.'';
 	       cfar_print_log_messages($log);
+       }
+       //If project title isn't already in db, add new project, else display error
+       if (!get_page_by_title( $project_title, 'OBJECT', 'projects' )) {
+       		       
+	       $new_post = array(
+	       	   'post_type' => 'projects',    
+		   'post_title'    =>   $project_title,
+		   'post_content'  =>   $project_description,
+		   'post_date'     =>   $date,
+		   'post_status'   =>   'publish',
+		   'post_author' => get_current_user_id(),
+		);
+		
+		//SAVE THE POST
+	       $pid = wp_insert_post($new_post);
+       } else {
+	   $log['error'][] = "Project with title: ".$project_title." already exists. Check and fix row: " . $row . " of .csv file";
+	   cfar_print_log_messages($log);
+	   return; 
        }
 }
 
