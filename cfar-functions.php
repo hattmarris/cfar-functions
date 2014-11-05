@@ -145,6 +145,7 @@ function cfar_import_master_function() {
 	$log = array();
 	if (isset($_POST['submit']) && $plugin_page == 'import-projects' ) {
 		$core = get_term($core_id, 'core');
+		$core = $core->slug;
 		if (empty($_FILES['csv_import']['tmp_name'])) {
 			$log['error'][] = 'No file uploaded, aborting.';
 			cfar_print_log_messages($log);
@@ -155,8 +156,75 @@ function cfar_import_master_function() {
 			cfar_print_log_messages($log);
 			return;
 		}
-		//$csv = array_map('str_getcsv', file('data.csv'));
+		$file = $_FILES['csv_import']['tmp_name'];
+		//$csv = array_map('str_getcsv', file($file));
+		ini_set('auto_detect_line_endings',TRUE);
+		$flag = true;
+		$row = 2;
+		if (($handle = fopen($file, "r")) !== FALSE) {
+		    while (($data = fgetcsv($handle, 1000, "," )) !== FALSE) {
+		    	if($flag) { $flag = false; continue; } //because the first time while loop is entered - the flag is true so it skips code block (does not continue) and runs while loop again
+			$num = count($data);
+			//echo "<p> $num fields in line $row: <br /></p>\n";
+			$id = $data[0]; 
+			$timestamp = $data[1]; 
+			$pi_name = $data[2];
+			$pi_phone = $data[3];
+			$pi_email = $data[4];
+			$pi_org = $data[5];
+			$pi_other_org = $data[6];
+			$user_name = $data[7];
+			$user_phone = $data[8];
+			$user_email = $data[9];
+			$project_title = $data[10];
+			$project_funding_source = $data[11];
+			$project_funding_source_addendum = $data[12];
+			$project_grant_title = $data[13];
+			$project_grant_number = $data[14];
+			$project_description = $data[15];
+			$project_irb_approval = $data[16];
+			$services = $data[17];
+			$other_service = $data[18];
+			$notes_core_service = $data[19];
+			$notes_award_title = $data[20];
+			$percent_effort = $data[21]; //21 because array starts at 0 (count shows 22 columns)
+			
+			cfar_csv_create_user($core, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $user_name, $user_phone, $user_email);
+				   
+			/*//Print all the data for inspection
+			for ($c=0; $c < $num; $c++) {
+			    echo $data[$c] . "<br />\n";
+			}*/
+			$row++;
+		    }
+		    fclose($handle);
+		}
+		ini_set('auto_detect_line_endings',FALSE);
+		//wp_die();
 	}
+}
+
+function cfar_csv_create_user($core, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $user_name, $user_phone, $user_email) {
+       if ( username_exists( $user_name ) ) {
+	   $log['error'][] = "Username: ".$user_name." already in use. Check and fix row: " . $row . " of .csv file to upload user.";
+	   cfar_print_log_messages($log);
+	   return;
+       }
+       elseif (email_exists($pi_email)) {
+	   $log['error'][] = "Email: ".$pi_email." already in use. Check and fix row: " . $row . " of .csv file to upload user.";
+	   cfar_print_log_messages($log);
+	   return;       	       
+       } else {
+	       $random_password = wp_generate_password( $length=12, $include_standard_special_chars=false );
+	       $user_id = wp_create_user( $user_name, $random_password, $pi_email );
+	       $full_name = explode(" ", $pi_name);
+	       wp_update_user( array ('ID' => $user_id, 'first_name'=> $full_name[0], 'last_name'=> $full_name[1]) ) ;
+	       update_user_meta( $user_id, 'organization', $pi_org );
+	       update_user_meta( $user_id, 'phone', $pi_phone );
+	       update_user_meta( $user_id, 'cfar_core', $core );
+	       $log['notice'][] = 'User '.$user_name.' created with password: '.$random_password.'';
+	       cfar_print_log_messages($log);
+       }
 }
 
 function cfar_print_log_messages($log) {
@@ -177,7 +245,7 @@ function cfar_print_log_messages($log) {
 
     <?php endif; ?>
 
-    <?php if (!empty($log->log['notice'])): ?>
+    <?php if (!empty($log['notice'])): ?>
 
     <div class="updated fade">
 
