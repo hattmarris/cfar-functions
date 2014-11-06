@@ -191,7 +191,7 @@ function cfar_import_master_function() {
 			
 			$date = gmdate("Y-m-d H:i:s", $timestamp);			
 			
-			cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $user_name, $user_phone, $user_email, $project_title, $project_description);
+			cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $user_name, $user_phone, $user_email, $project_title, $project_description, $project_funding_source, $project_funding_source_addendum);
 				   
 			/*//Print all the data for inspection
 			for ($c=0; $c < $num; $c++) {
@@ -206,7 +206,7 @@ function cfar_import_master_function() {
 	}
 }
 
-function cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $user_name, $user_phone, $user_email, $project_title, $project_description) {
+function cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $user_name, $user_phone, $user_email, $project_title, $project_description, $project_funding_source, $project_funding_source_addendum) {
        if ( username_exists( $user_name ) ) {
 	   $log['error'][] = "Username: ".$user_name." already in use. Check and fix row: " . $row . " of .csv file to upload user.";
 	   cfar_print_log_messages($log);
@@ -225,7 +225,6 @@ function cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $
 	       update_user_meta( $user_id, 'phone', $pi_phone );
 	       update_user_meta( $user_id, 'cfar_core', $core );
 	       $log['notice'][] = 'User '.$user_name.' created with password: '.$random_password.'';
-	       cfar_print_log_messages($log);
        }
        //If project title isn't already in db, add new project, else display error
        if (!get_page_by_title( $project_title, 'OBJECT', 'projects' )) {
@@ -241,11 +240,29 @@ function cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $
 		
 		//SAVE THE POST
 	       $pid = wp_insert_post($new_post);
+	       wp_set_object_terms( $pid, $core, 'core');
+	       wp_set_object_terms( $pid, $project_funding_source, 'sponsor');
+	       $addendums = explode(', ', $project_funding_source_addendum);
+	       foreach($addendums as $a) {
+	       	       wp_set_object_terms( $pid, $a, 'sponsor', true);
+	       }
+	       
+	       $log['notice'][] = 'Project #'.$pid.' '.$project_title.' created for '.$core.' core.';
+	       
+	       //Connect pi to project *******WRAPPED in if($user_id) statement so project can be created if user error, no id set
+	       if($user_id) {
+			$p2p_id = p2p_type( 'projects_to_pis' )->connect( $pid, $user_id, array(
+			    'date' => current_time('mysql')
+			) );
+			p2p_update_meta($p2p_id, 'role', 'Investigator');
+			$log['notice'][] = 'Project #'.$pid.' connected to pi: '.$user_name;
+	       }
        } else {
-	   $log['error'][] = "Project with title: ".$project_title." already exists. Check and fix row: " . $row . " of .csv file";
+	   $log['error'][] = "Project with title: ".$project_title." already exists, no new project created. Check and fix row: " . $row . " of .csv file";
 	   cfar_print_log_messages($log);
 	   return; 
        }
+       cfar_print_log_messages($log);
 }
 
 function cfar_print_log_messages($log) {
