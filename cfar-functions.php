@@ -202,7 +202,6 @@ function cfar_import_master_function() {
 		    fclose($handle);
 		}
 		ini_set('auto_detect_line_endings',FALSE);
-		//wp_die();
 	}
 }
 
@@ -222,6 +221,7 @@ function cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $
 	       $full_name = explode(" ", $pi_name);
 	       wp_update_user( array ('ID' => $user_id, 'first_name'=> $full_name[0], 'last_name'=> $full_name[1], 'role'=> 'principal_investigator') ) ;
 	       update_user_meta( $user_id, 'organization', $pi_org );
+	       update_user_meta( $user_id, 'other_org', $pi_other_org );
 	       update_user_meta( $user_id, 'phone', $pi_phone );
 	       update_user_meta( $user_id, 'cfar_core', $core );
 	       $log['notice'][] = 'User '.$user_name.' created with password: '.$random_password.'';
