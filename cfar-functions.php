@@ -237,14 +237,20 @@ function cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $
 		   'post_status'   =>   'publish',
 		   'post_author' => get_current_user_id(),
 		);
-		
-		//SAVE THE POST
+		//SAVE THE POST & set Core
 	       $pid = wp_insert_post($new_post);
 	       wp_set_object_terms( $pid, $core, 'core');
-	       wp_set_object_terms( $pid, $project_funding_source, 'sponsor');
+	       
+	       //overly complex ways to get term_ids for setting parent/child relationships because wp_set_object_terms returns term_taxonomy_id...
+	       $term_taxonomy_id = wp_set_object_terms( $pid, $project_funding_source, 'sponsor');
+	       $term = get_term_by( 'term_taxonomy_id', $term_taxonomy_id[0], 'sponsor' );
+	       $parent = $term->term_id;
 	       $addendums = explode(', ', $project_funding_source_addendum);
 	       foreach($addendums as $a) {
-	       	       wp_set_object_terms( $pid, $a, 'sponsor', true);
+	       	      $child_term_taxonomy_id = wp_set_object_terms( $pid, $a, 'sponsor', true);
+	       	      $child_term = get_term_by( 'term_taxonomy_id', $child_term_taxonomy_id[0], 'sponsor' );
+	       	      $child = $child_term->term_id;
+	       	      wp_update_term( $child, 'sponsor', array('parent' => $parent) );
 	       }
 	       
 	       $log['notice'][] = 'Project #'.$pid.' '.$project_title.' created for '.$core.' core.';
