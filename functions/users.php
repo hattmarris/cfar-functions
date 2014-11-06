@@ -275,6 +275,14 @@ function my_show_extra_profile_fields( $user ) {
 			</td>
 		</tr>
 		<tr>
+			<th><label for="organization">Other Organization</label></th>
+
+			<td>
+				<input type="text" name="other_org" id="other_org" value="<?php echo esc_attr( get_the_author_meta( 'other_org', $user->ID ) ); ?>" class="regular-text" /><br />
+				<span class="description">Other Organization(s) user is affiliated with.</span>
+			</td>
+		</tr>
+		<tr>
 			<th><label for="cb_number">CB Number</label></th>
 
 			<td>
@@ -376,6 +384,7 @@ function my_save_extra_profile_fields( $user_id ) {
 	update_user_meta( $user_id, 'hiv_interest', $_POST['hiv_interest'] );
 	update_user_meta( $user_id, 'position', $_POST['position'] );
 	update_user_meta( $user_id, 'organization', $_POST['organization'] );
+	update_user_meta( $user_id, 'other_org', $_POST['other_org'] );
 	update_user_meta( $user_id, 'cb_number', $_POST['cb_number'] );
 	update_user_meta( $user_id, 'phone', $_POST['phone'] );
 	update_user_meta( $user_id, 'fax', $_POST['fax'] );
