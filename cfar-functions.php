@@ -176,13 +176,23 @@ function cfar_import_master_function() {
 			$project_funding_source = $data[7];
 			$project_funding_source_addendum = $data[8];
 			$project_grant_title = $data[9];
-			$project_grant_number = $data[10];
-			$project_description = $data[11];
-			$project_irb_approval = $data[12];
+			$activity_code = $data[10];
+			$serial_number = $data[11];
+			$project_grant_number = $data[12];
+			$project_description = $data[13];
+			$project_irb_approval = $data[14];
+			$project_irb_number = $data[15];
+			$publications_presentations = $data[16];
+			$core_effort = $data[17];
 			
-			$date = gmdate("Y-m-d H:i:s", $timestamp);			
+			if($timestamp) {
+				$date = gmdate("Y-m-d H:i:s", $timestamp);
+			} else {
+				$ts = time();
+				$date = gmdate("Y-m-d H:i:s", $ts);
+			}
 			
-			cfar_process_csv_create_project_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $project_title, $project_description, $project_funding_source, $project_funding_source_addendum, $project_grant_title, $project_grant_number, $project_irb_approval);
+			cfar_process_csv_create_project_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $project_title, $project_description, $project_funding_source, $project_funding_source_addendum, $project_grant_title, $activity_code, $serial_number, $project_grant_number, $project_irb_approval, $project_irb_number, $publications_presentations, $core_effort);
 				   
 			/*//Print all the data for inspection
 			for ($c=0; $c < $num; $c++) {
@@ -196,7 +206,7 @@ function cfar_import_master_function() {
 	}
 }
 
-function cfar_process_csv_create_project_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $project_title, $project_description, $project_funding_source, $project_funding_source_addendum, $project_grant_title, $project_grant_number, $project_irb_approval) {
+function cfar_process_csv_create_project_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $project_title, $project_description, $project_funding_source, $project_funding_source_addendum, $project_grant_title, $activity_code, $serial_number, $project_grant_number, $project_irb_approval, $project_irb_number, $publications_presentations, $core_effort) {
        if ( username_exists( $user_name ) ) {
 	   $log['error'][] = "Username: ".$user_name." already in use. Check and fix row: " . $row . " of .csv file to upload user.";
 	   cfar_print_log_messages($log);
@@ -246,6 +256,24 @@ function cfar_process_csv_create_project_user($core, $date, $row, $pi_name, $pi_
 	       } //else N/A is default for field
 	       if($project_grant_number){
 	       	       update_post_meta($pid, 'cfar_projects_grant_number', $project_grant_number);
+	       }
+	       //set activity code
+	       if($activity_code != ''){
+	       	       $activity_code = strtolower($activity_code);
+	       	       wp_set_object_terms($pid, $activity_code, 'activity_code', true);
+	       }
+	       //other meta fields
+	       if($serial_number) {
+	       	       update_post_meta($pid, 'cfar_projects_serial_number', $serial_number);
+	       }
+	       if($project_irb_number) {
+	       	       update_post_meta($pid, 'cfar_projects_irb_number', $project_irb_number);
+	       }
+	       if($publications_presentations) {
+	       	       update_post_meta($pid, 'cfar_projects_publications_presentations', $publications_presentations);
+	       }
+	       if($core_effort) {
+	       	       update_post_meta($pid, 'cfar_projects_percent_core_effort', $core_effort);
 	       }
 	       
 	       //overly complex ways to get term_ids for setting parent/child relationships because wp_set_object_terms returns term_taxonomy_id not term_id...
@@ -534,7 +562,7 @@ function cfar_export_master_function() {
 								//content of project post
 								$content = get_the_content();
 								$html .= '<tr>';
-								$html .= '<td>'.$sponsor_list.'</td><td>'.$investigators. '<br><br><em>'.$coinvestigators.'</em></td><td><u>'.$activity_codes[0].' '.$ao_code.$serial_number.'</u></td><td>'.$ticket_meta_list.'<td>' . $post->post_title . '<br><br>'.$content.'<br><br>'.$irb.'<br><br>'.$pubs.'</td><td>'.$effort.'</td>';
+								$html .= '<td>'.$sponsor_list.'</td><td>'.$investigators. '<br><br><em>'.$coinvestigators.'</em></td><td><u>'.$activity_codes[0].' '.$ao_code.$serial_number.'</u></td><td>'.$ticket_meta_list.'<td>' . $post->post_title . '<br><br>'.$content.'<br><br>['.$irb.']<br><br>['.$pubs.']</td><td>'.$effort.'</td>';
 								$html .= '</tr>';
 							}
 						} else {
