@@ -426,13 +426,13 @@ function cfar_export_master_function() {
 			$top_level_sponsors = get_terms($taxonomy_name, $a);
 			foreach($top_level_sponsors as $top_level_sponsor){
 				$name = $top_level_sponsor->name;
-				$html .= '<tr><td>'.$name.'</td></tr>';
+				$html .= '<tr><td><b>'.$name.'</b></td></tr>';
 				$children = get_term_children($top_level_sponsor->term_id, $taxonomy_name);
 				// NOT Checking for each unique child... 
 				foreach($children as $child) {
 					$term = get_term_by( 'id', $child, $taxonomy_name );
 					if($term->count != 0) {
-						$html .= '<tr><td>'.$term->name.'</td></tr>';
+						$html .= '<tr><td><b>'.$term->name.'</b></td></tr>';
 						/**
 						*  Row is added for the top level sponsor above, then the query is run based on projects associated with that sponsor
 						*  
@@ -498,22 +498,27 @@ function cfar_export_master_function() {
 									'connected_type' => 'tickets_to_projects',
 									'connected_items' => $post
 								) );
-								if(!empty($tickets)){
+								if(!empty($tickets)) {
 									$ticket_meta_list = '';
 									$meta = '';
 									foreach($tickets as $ticket) {
 										$statuses = '';
-										$cores = '';
-										$cores = get_the_terms( $ticket->ID, 'core' );
-										if($cores){$core = array_pop($cores);}
+										$t_cores = '';
+										$t_cores = get_the_terms( $ticket->ID, 'core' );
+										$t_core = array_pop($t_cores);
 										$statuses = get_the_terms($ticket->ID, 'status');
-										if($statuses) {
+										if(!empty($statuses)) {
 											$status = array_pop($statuses);
 											if($status->slug == 'wpas-close') {
-												if($core->slug == 'clinical'){
+												if($t_core->slug == 'clinical'){
 													$meta[] = get_post_meta($ticket->ID, 'cfar_clinical_access_uchcc', true);
 													$meta[] = get_post_meta($ticket->ID, 'cfar_clinical_study_coordination', true);
 													$meta[] = get_post_meta($ticket->ID, 'cfar_clinical_other_services', true);
+												}
+												if($t_core->slug == 'clinical-pharmacology'){
+													$meta[] = get_post_meta($ticket->ID, 'cfar_cpharm_services_required', true);
+													$meta[] = get_post_meta($ticket->ID, 'cfar_cpharm_drugs_text', true);
+													$meta[] = get_post_meta($ticket->ID, 'cfar_cpharm_sample_numbers_text', true);
 												}
 											}
 										}
