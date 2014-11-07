@@ -191,7 +191,7 @@ function cfar_import_master_function() {
 			
 			$date = gmdate("Y-m-d H:i:s", $timestamp);			
 			
-			cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $user_name, $user_phone, $user_email, $project_title, $project_description, $project_funding_source, $project_funding_source_addendum);
+			cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $user_name, $user_phone, $user_email, $project_title, $project_description, $project_funding_source, $project_funding_source_addendum, $project_grant_title);
 				   
 			/*//Print all the data for inspection
 			for ($c=0; $c < $num; $c++) {
@@ -205,7 +205,7 @@ function cfar_import_master_function() {
 	}
 }
 
-function cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $user_name, $user_phone, $user_email, $project_title, $project_description, $project_funding_source, $project_funding_source_addendum) {
+function cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $user_name, $user_phone, $user_email, $project_title, $project_description, $project_funding_source, $project_funding_source_addendum, $project_grant_title) {
        if ( username_exists( $user_name ) ) {
 	   $log['error'][] = "Username: ".$user_name." already in use. Check and fix row: " . $row . " of .csv file to upload user.";
 	   cfar_print_log_messages($log);
@@ -240,8 +240,11 @@ function cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $
 		//SAVE THE POST & set Core
 	       $pid = wp_insert_post($new_post);
 	       wp_set_object_terms( $pid, $core, 'core');
+	       //Ignore special / International characters - umlaut wasn't saving to db
+	       $g = iconv("UTF-8", "ISO-8859-1//IGNORE", $project_grant_title);
+	       update_post_meta($pid, 'cfar_projects_grant_title', $g);
 	       
-	       //overly complex ways to get term_ids for setting parent/child relationships because wp_set_object_terms returns term_taxonomy_id...
+	       //overly complex ways to get term_ids for setting parent/child relationships because wp_set_object_terms returns term_taxonomy_id not term_id...
 	       $term_taxonomy_id = wp_set_object_terms( $pid, $project_funding_source, 'sponsor');
 	       $term = get_term_by( 'term_taxonomy_id', $term_taxonomy_id[0], 'sponsor' );
 	       $parent = $term->term_id;
@@ -425,6 +428,7 @@ function cfar_export_master_function() {
 				$name = $top_level_sponsor->name;
 				$html .= '<tr><td>'.$name.'</td></tr>';
 				$children = get_term_children($top_level_sponsor->term_id, $taxonomy_name);
+				// NOT Checking for each unique child... 
 				foreach($children as $child) {
 					$term = get_term_by( 'id', $child, $taxonomy_name );
 					if($term->count != 0) {
@@ -494,26 +498,28 @@ function cfar_export_master_function() {
 									'connected_type' => 'tickets_to_projects',
 									'connected_items' => $post
 								) );
-								$ticket_meta_list = '';
-								$meta = '';
-								foreach($tickets as $ticket) {
-									$statuses = '';
-									$cores = '';
-									$cores = get_the_terms( $ticket->ID, 'core' );
-									if($cores){$core = array_pop($cores);}
-									$statuses = get_the_terms($ticket->ID, 'status');
-									if($statuses) {
-										$status = array_pop($statuses);
-										if($status->slug == 'wpas-close') {
-											if($core->slug == 'clinical'){
-												$meta[] = get_post_meta($ticket->ID, 'cfar_clinical_access_uchcc', true);
-												$meta[] = get_post_meta($ticket->ID, 'cfar_clinical_study_coordination', true);
-												$meta[] = get_post_meta($ticket->ID, 'cfar_clinical_other_services', true);
+								if(!empty($tickets)){
+									$ticket_meta_list = '';
+									$meta = '';
+									foreach($tickets as $ticket) {
+										$statuses = '';
+										$cores = '';
+										$cores = get_the_terms( $ticket->ID, 'core' );
+										if($cores){$core = array_pop($cores);}
+										$statuses = get_the_terms($ticket->ID, 'status');
+										if($statuses) {
+											$status = array_pop($statuses);
+											if($status->slug == 'wpas-close') {
+												if($core->slug == 'clinical'){
+													$meta[] = get_post_meta($ticket->ID, 'cfar_clinical_access_uchcc', true);
+													$meta[] = get_post_meta($ticket->ID, 'cfar_clinical_study_coordination', true);
+													$meta[] = get_post_meta($ticket->ID, 'cfar_clinical_other_services', true);
+												}
 											}
 										}
 									}
+									if($meta != ''){$ticket_meta_list = join("; ", $meta);}
 								}
-								if($meta){$ticket_meta_list = join("; ", $meta);}
 								//content of project post
 								$content = get_the_content();
 								$html .= '<tr>';
