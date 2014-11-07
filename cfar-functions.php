@@ -152,7 +152,7 @@ function cfar_import_master_function() {
 			return;
 		}
 		if (!current_user_can('publish_pages') || !current_user_can('publish_posts')) {
-			$log['error'][] = 'You don\'t have the permissions to publish posts and pages. Please contact the blog\'s administrator.';
+			$log['error'][] = 'You don\'t have the permissions to publish posts and pages. Please contact an administrator.';
 			cfar_print_log_messages($log);
 			return;
 		}
@@ -166,32 +166,23 @@ function cfar_import_master_function() {
 		    	if($flag) { $flag = false; continue; } //because the first time while loop is entered - the flag is true so it skips code block (does not continue) and runs while loop again
 			$num = count($data);
 			//echo "<p> $num fields in line $row: <br /></p>\n";
-			$id = $data[0]; 
-			$timestamp = $data[1]; 
-			$pi_name = $data[2];
-			$pi_phone = $data[3];
-			$pi_email = $data[4];
-			$pi_org = $data[5];
-			$pi_other_org = $data[6];
-			$user_name = $data[7];
-			$user_phone = $data[8];
-			$user_email = $data[9];
-			$project_title = $data[10];
-			$project_funding_source = $data[11];
-			$project_funding_source_addendum = $data[12];
-			$project_grant_title = $data[13];
-			$project_grant_number = $data[14];
-			$project_description = $data[15];
-			$project_irb_approval = $data[16];
-			$services = $data[17];
-			$other_service = $data[18];
-			$notes_core_service = $data[19];
-			$notes_award_title = $data[20];
-			$percent_effort = $data[21]; //21 because array starts at 0 (count shows 22 columns)
+			$timestamp = $data[0]; 
+			$pi_name = $data[1];
+			$pi_phone = $data[2];
+			$pi_email = $data[3];
+			$pi_org = $data[4];
+			$pi_other_org = $data[5];
+			$project_title = $data[6];
+			$project_funding_source = $data[7];
+			$project_funding_source_addendum = $data[8];
+			$project_grant_title = $data[9];
+			$project_grant_number = $data[10];
+			$project_description = $data[11];
+			$project_irb_approval = $data[12];
 			
 			$date = gmdate("Y-m-d H:i:s", $timestamp);			
 			
-			cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $user_name, $user_phone, $user_email, $project_title, $project_description, $project_funding_source, $project_funding_source_addendum, $project_grant_title, $project_irb_approval);
+			cfar_process_csv_create_project_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $project_title, $project_description, $project_funding_source, $project_funding_source_addendum, $project_grant_title, $project_grant_number, $project_irb_approval);
 				   
 			/*//Print all the data for inspection
 			for ($c=0; $c < $num; $c++) {
@@ -205,7 +196,7 @@ function cfar_import_master_function() {
 	}
 }
 
-function cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $user_name, $user_phone, $user_email, $project_title, $project_description, $project_funding_source, $project_funding_source_addendum, $project_grant_title, $project_irb_approval) {
+function cfar_process_csv_create_project_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $project_title, $project_description, $project_funding_source, $project_funding_source_addendum, $project_grant_title, $project_grant_number, $project_irb_approval) {
        if ( username_exists( $user_name ) ) {
 	   $log['error'][] = "Username: ".$user_name." already in use. Check and fix row: " . $row . " of .csv file to upload user.";
 	   cfar_print_log_messages($log);
@@ -215,7 +206,14 @@ function cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $
 	   $log['error'][] = "Email: ".$pi_email." already in use. Check and fix row: " . $row . " of .csv file to upload user.";
 	   cfar_print_log_messages($log);
 	   return;       	       
+       } elseif ($pi_email == ''){
+	   $log['error'][] = "No email entered for ".$pi_name." Check and fix row: " . $row . " of .csv file to upload user and corresponding projects.";
+	   cfar_print_log_messages($log);
+	   return;  
        } else {
+       	       // Take pi_name -> lowercase and concatenate to form a wp user_name
+	       $string = strtolower($pi_name);
+	       $user_name = str_replace(' ', '', $string);
 	       $random_password = wp_generate_password( $length=12, $include_standard_special_chars=false );
 	       $user_id = wp_create_user( $user_name, $random_password, $pi_email );
 	       $full_name = explode(" ", $pi_name);
@@ -246,6 +244,9 @@ function cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $
 	       if($project_irb_approval == 'Yes' || $project_irb_approval == 'Pending' ) {
 	       	       update_post_meta($pid, 'cfar_projects_irb_approval', $project_irb_approval);
 	       } //else N/A is default for field
+	       if($project_grant_number){
+	       	       update_post_meta($pid, 'cfar_projects_grant_number', $project_grant_number);
+	       }
 	       
 	       //overly complex ways to get term_ids for setting parent/child relationships because wp_set_object_terms returns term_taxonomy_id not term_id...
 	       $term_taxonomy_id = wp_set_object_terms( $pid, $project_funding_source, 'sponsor');
