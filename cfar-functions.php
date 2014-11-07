@@ -191,7 +191,7 @@ function cfar_import_master_function() {
 			
 			$date = gmdate("Y-m-d H:i:s", $timestamp);			
 			
-			cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $user_name, $user_phone, $user_email, $project_title, $project_description, $project_funding_source, $project_funding_source_addendum, $project_grant_title);
+			cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $user_name, $user_phone, $user_email, $project_title, $project_description, $project_funding_source, $project_funding_source_addendum, $project_grant_title, $project_irb_approval);
 				   
 			/*//Print all the data for inspection
 			for ($c=0; $c < $num; $c++) {
@@ -205,7 +205,7 @@ function cfar_import_master_function() {
 	}
 }
 
-function cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $user_name, $user_phone, $user_email, $project_title, $project_description, $project_funding_source, $project_funding_source_addendum, $project_grant_title) {
+function cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $pi_email, $pi_org, $pi_other_org, $user_name, $user_phone, $user_email, $project_title, $project_description, $project_funding_source, $project_funding_source_addendum, $project_grant_title, $project_irb_approval) {
        if ( username_exists( $user_name ) ) {
 	   $log['error'][] = "Username: ".$user_name." already in use. Check and fix row: " . $row . " of .csv file to upload user.";
 	   cfar_print_log_messages($log);
@@ -243,6 +243,9 @@ function cfar_process_csv_create_user($core, $date, $row, $pi_name, $pi_phone, $
 	       //Ignore special / International characters - umlaut wasn't saving to db
 	       $g = iconv("UTF-8", "ISO-8859-1//IGNORE", $project_grant_title);
 	       update_post_meta($pid, 'cfar_projects_grant_title', $g);
+	       if($project_irb_approval == 'Yes' || $project_irb_approval == 'Pending' ) {
+	       	       update_post_meta($pid, 'cfar_projects_irb_approval', $project_irb_approval);
+	       } //else N/A is default for field
 	       
 	       //overly complex ways to get term_ids for setting parent/child relationships because wp_set_object_terms returns term_taxonomy_id not term_id...
 	       $term_taxonomy_id = wp_set_object_terms( $pid, $project_funding_source, 'sponsor');
@@ -494,6 +497,8 @@ function cfar_export_master_function() {
 								/**
 								*  Okay! Let's get those service requests connected to this project!
 								*/
+								$ticket_meta_list = '';
+								$meta = '';
 								$tickets = get_posts( array(
 									'connected_type' => 'tickets_to_projects',
 									'connected_items' => $post
