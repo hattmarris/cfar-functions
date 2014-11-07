@@ -781,5 +781,119 @@ function cfar_wpas_ticket_details_mb() {
 	    	  
 	    	  //Leaving comment for now... issue: meta information is wiped by wp_set_object_terms() when new core is selected. Ultimately may not be a problem. 
 	    	  //Issue 2 nonce on projects CMB field - CMB class checks nonce already I believe
-	}	
+	}
+/**
+*  Changing Post date when ticket is marked closed
+*/	
+	add_action( 'save_post', 'cfar_update_ticket_date_on_close', 9, 2 );
+	function cfar_update_ticket_date_on_close($post_id, $post) {
+		
+		if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) || wp_is_post_revision( $post_id ) ) 
+			return;
+		
+		/* Get the post type object. */
+		$post_type = get_post_type_object( $post->post_type );		
+		
+		/* Check if the current user has permission to edit the post. */
+		if ( !current_user_can( $post_type->cap->edit_post, $post_id ) )
+			return $post_id;
+		
+		if($post_type->name != 'tickets')
+			return;
+		
+		$currents = get_the_terms( $post_id, 'status' );
+
+		$curr_status = '';
+
+		if( is_array($currents) ) {
+			foreach($currents as $current) {
+				$current = $current->slug;
+			}
+			$curr_status = $current;
+		}
+		
+		if($_POST['status']=='wpas-close') {
+			if($curr_status == 'wpas-open') {
+				//We're going from open to close, so we can save a new time on the post_date of this ticket.
+				$timestamp = time();
+				$date = gmdate("Y-m-d H:i:s", $timestamp);
+				global $wpdb;
+				$wpdb->query( $wpdb->prepare("UPDATE $wpdb->posts SET post_date = '$date' WHERE id = $post_id", $post_id ));
+			}
+		}
+	}
+/**
+*  Adding timestamps to Publish box for tickets
+*/
+//add_action( 'post_submitbox_misc_actions', 'article_or_box' );
+function article_or_box() {
+    global $post;
+    if (get_post_type($post) == 'tickets') {
+    	echo '<div class="misc-pub-section curtime misc-pub-curtime">
+	<span id="timestamp">
+	Published on: <b>Nov 7, 2014 @ 3:56</b></span>
+	<a href="#edit_timestamp" class="edit-timestamp hide-if-no-js"><span aria-hidden="true">Edit</span> <span class="screen-reader-text">Edit date and time</span></a>
+	<div id="timestampdiv" class="hide-if-js"><div class="timestamp-wrap"><label for="mm" class="screen-reader-text">Month</label><select id="mm" name="mm">
+			<option value="01">01-Jan</option>
+			<option value="02">02-Feb</option>
+			<option value="03">03-Mar</option>
+			<option value="04">04-Apr</option>
+			<option value="05">05-May</option>
+			<option value="06">06-Jun</option>
+			<option value="07">07-Jul</option>
+			<option value="08">08-Aug</option>
+			<option value="09">09-Sep</option>
+			<option value="10">10-Oct</option>
+			<option value="11" selected="selected">11-Nov</option>
+			<option value="12">12-Dec</option>
+</select> <label for="jj" class="screen-reader-text">Day</label><input type="text" id="jj" name="jj" value="07" size="2" maxlength="2" autocomplete="off">, <label for="aa" class="screen-reader-text">Year</label><input type="text" id="aa" name="aa" value="2014" size="4" maxlength="4" autocomplete="off"> @ <label for="hh" class="screen-reader-text">Hour</label><input type="text" id="hh" name="hh" value="03" size="2" maxlength="2" autocomplete="off"> : <label for="mn" class="screen-reader-text">Minute</label><input type="text" id="mn" name="mn" value="56" size="2" maxlength="2" autocomplete="off"></div><input type="hidden" id="ss" name="ss" value="50">
+
+<input type="hidden" id="hidden_mm" name="hidden_mm" value="11">
+<input type="hidden" id="cur_mm" name="cur_mm" value="11">
+<input type="hidden" id="hidden_jj" name="hidden_jj" value="07">
+<input type="hidden" id="cur_jj" name="cur_jj" value="07">
+<input type="hidden" id="hidden_aa" name="hidden_aa" value="2014">
+<input type="hidden" id="cur_aa" name="cur_aa" value="2014">
+<input type="hidden" id="hidden_hh" name="hidden_hh" value="03">
+<input type="hidden" id="cur_hh" name="cur_hh" value="05">
+<input type="hidden" id="hidden_mn" name="hidden_mn" value="56">
+<input type="hidden" id="cur_mn" name="cur_mn" value="34">
+
+<p>
+<a href="#edit_timestamp" class="save-timestamp hide-if-no-js button">OK</a>
+<a href="#edit_timestamp" class="cancel-timestamp hide-if-no-js button-cancel">Cancel</a>
+</p>
+</div>
+</div>';
+        /*echo '<div class="misc-pub-section misc-pub-section-last" style="border-top: 1px solid #eee;">';
+        wp_nonce_field( plugin_basename(__FILE__), 'article_or_box_nonce' );
+        $val = get_post_meta( $post->ID, '_article_or_box', true ) ? get_post_meta( $post->ID, '_article_or_box', true ) : 'article';
+        echo '<input type="radio" name="article_or_box" id="article_or_box-article" value="article" '.checked($val,'article',false).' /> <label for="article_or_box-article" class="select-it">Article</label><br />';
+        echo '<input type="radio" name="article_or_box" id="article_or_box-box" value="box" '.checked($val,'box',false).'/> <label for="article_or_box-box" class="select-it">Box</label>';
+        echo '</div>';*/
+    }
+}
+//add_action( 'save_post', 'save_article_or_box' );
+function save_article_or_box($post_id) {
+
+    if (!isset($_POST['post_type']) )
+        return $post_id;
+
+    if ( !wp_verify_nonce( $_POST['article_or_box_nonce'], plugin_basename(__FILE__) ) )
+        return $post_id;
+
+    if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) 
+        return $post_id;
+
+    if ( 'post' == $_POST['post_type'] && !current_user_can( 'edit_post', $post_id ) )
+        return $post_id;
+    
+    if (!isset($_POST['article_or_box']))
+        return $post_id;
+    else {
+        $mydata = $_POST['article_or_box'];
+        update_post_meta( $post_id, '_article_or_box', $_POST['article_or_box'], get_post_meta( $post_id, '_article_or_box', true ) );
+    }
+
+}	
 ?>
