@@ -238,10 +238,13 @@ function cfar_add_project_post($entry, $form){
 		p2p_type( 'tickets_to_projects' )->connect( $ticket, $project, array(
 		    'date' => current_time('mysql')
 		) );
+		
 		$pi = $entry["1"];
-		p2p_type( 'projects_to_pis' )->connect( $project, $pi, array(
+		$p2p_id = p2p_type( 'projects_to_pis' )->connect( $project, $pi, array(
 		    'date' => current_time('mysql')
 		) );
+		
+		p2p_update_meta($p2p_id, 'role', 'Investigator');
 		
 		//add the core taxonomy to the project
 		$selected_core = $entry["79"];
