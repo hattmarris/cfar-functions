@@ -448,9 +448,10 @@ function cfar_projects_metaboxes( $meta_boxes ) {
 		    );
     }
     
-    global $post;
-    $terms = wp_get_object_terms( $post->ID, 'core' );
-    $std = $terms[0]->slug;
+    if( isset( $_GET['post'] ) ) $post_id = $_GET['post'];
+    elseif( isset( $_POST['post_ID'] ) ) $post_id = $_POST['post_ID'];
+    $terms = wp_get_object_terms( $post_id, 'core' );
+    $default = $terms[0]->slug;
 	
     $meta_boxes['project_details_metabox'] = array(    
         'id' => 'project_details_fields_metabox',
@@ -463,11 +464,17 @@ function cfar_projects_metaboxes( $meta_boxes ) {
             array(
 	        'name' => 'Core',
 	        'desc' => 'CFAR Core',
-	        'std' => $std,
 	        'id' => $prefix . 'core',
 	        'type' => 'select',
-	        'options' => $cores
-	    ),        	
+	        'options' => $cores,
+	        'default' => $default
+	    ),
+	    array(
+	        'name' => 'Grant Title',
+	        'desc' => 'Put the project grant or award title here if it is different from the project title.',
+	        'id' => $prefix . 'grant_title',
+	        'type' => 'text'
+	    ),
 	    array(
 	        'name' => 'Serial Number',
 	        'desc' => 'Put the NIH serial number here if applicable. The administering organization code will be appended based on your sponsor selection.',
