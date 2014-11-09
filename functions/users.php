@@ -187,8 +187,10 @@ function cfar_remove_wpas_user_roles() {
 //Begin customizing the Profile Page
 add_action( 'show_user_profile', 'my_show_extra_profile_fields' );
 add_action( 'edit_user_profile', 'my_show_extra_profile_fields' );
-function my_show_extra_profile_fields( $user ) { 
-		if( !current_user_can( 'administrator' ) )
+function my_show_extra_profile_fields( $user ) {
+		$admin = current_user_can( 'administrator' );
+		$core_admin = current_user_can( 'core_administrator' );
+		if( $admin == false && $core_admin == false)
 			return;
 	$val 	= get_user_meta( $user->ID, 'cfar_core', true );
 	$groups = get_terms( 'core', array('hide_empty' => 0) );
