@@ -24,6 +24,26 @@ foreach($cores as $core){
 $html .= '</ul></p>';
 
 /**
+* Date Range selection
+*/
+
+$html .= '<h3>Date Range:</h3>';
+
+$html .= '<label for="start-date">
+		<strong>
+			Start Date:
+		</strong>
+	</label>
+	<input type="date" name="start-date" id="start-date" value="">';
+
+$html .= '<label for="end-date">
+		<strong>
+			End Date:
+		</strong>
+	</label>
+	<input type="date" name="end-date" id="end-date" value="">';
+
+/**
 * Adds radio selection of file format
 */
 
