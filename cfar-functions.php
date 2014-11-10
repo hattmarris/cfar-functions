@@ -371,62 +371,154 @@ function cfar_export_master_function() {
 	$end_date = $_POST['end-date'];
 	if (isset($_POST['submit']) && $plugin_page == 'export-projects' ) {
 		if($_POST['type'] == 'csv') {
-			$args = array(
-				'post_type' => 'tickets',
-			);
-			$q = new WP_Query( $args );
-			if ( $q->have_posts() ) {
-				while ( $q->have_posts() ) {
-					$q->the_post();
-					global $post;
-					$user = get_user_by('id',$post->post_author);
-					$title = get_the_title();
-					$pis = get_users( array(
-						'connected_type' => 'tickets_to_pis',
-						'connected_items' => $post
-					) );
-					$i = 1;
-					foreach($pis as $pi) {
-						$pi_names .= $i++;
-						$pi_names .= '. ' . $pi->display_name . ' ';
-					}
-					$projects = get_posts( array(
-						'connected_type' => 'tickets_to_projects',
-						'connected_items' => $post
-					) );
-					$i = 1;
-					foreach($projects as $project) {
-						$project_titles .= $i++;
-						$project_titles .= '. ' . $project->post_title;
-					}
-					$sponsors = get_the_terms($projects[0]->ID, 'sponsor');
-					foreach($sponsors as $sponsor) {
-						if($sponsor->parent != 0){
-							$subfunder .= $sponsor->name;
-						} else {
-							$funder .= $sponsor->name;
-						}	
-					}
-					//in process building rows for csv export
-					//echo '<li>' . $post->ID . ', ' . $post->post_date . ', ' . $pi_names . ', ' . $pis[0]->phone . ', ' . $pis[0]->user_email . ', ' . $pis[0]->organization . ', ' . $pis[0]->other_org . ', ' . $user->display_name . ', ' . $user->phone . ', ' . $user->user_email . ', ' . $project_titles . ', ' . $funder . ', ' . $subfunder . '</li>';
-	
-					$results[] = $pi->display_name;//$title; 
+			$timestamp = time();
+			$date = gmdate("Y-m-d", $timestamp);
+			$name = 'table5_export_' . $core . '_' . $date . '.csv';
+				/**
+				*  
+				*  $core variable for querying projects only from a certain core, was set by $_POST['core']
+				*  (If core is 'all' the query is set as null value)
+				*
+				*  $date_args are null if both start and end are not set
+				*
+				*/
+				if($core == 'all'){$core = null;}
+				if($start_date == '' && $end_date == '') {
+					$date_args = null;
+				} else {
+					$date_args = array(
+						array(
+							'after'      => $start_date,
+							'before'   => $end_date . '23:59:59',
+							'inclusive' => true,
+						),
+					);
 				}
-			} else {
-				echo  'no service request tickets found';
-			}
-			/* Restore original Post Data */
-			wp_reset_postdata();
-			foreach ($results as &$value)
+				$args = array(
+					'post_type' => 'projects',
+					'order' => 'ASC',
+					'core' => $core,
+					'date_query' => $date_args
+				);
+				$q = new WP_Query( $args );
+				if ( $q->have_posts() ) {
+					while ( $q->have_posts() ) {
+						$q->the_post();
+						global $post;						
+						//Get sponsors of this project
+						$sponsors = array();
+						$programs = array();
+						$terms = get_the_terms( $post->ID, 'sponsor' );
+						foreach($terms as $term){
+							if($term->parent == 0) {
+								$sponsors[] = $term->name;
+							}
+							//Children only since we already have the top level in a row, joined by comma as sponsor list
+							if($term->parent != 0) {
+								$programs[] = $term->name;
+								$t_id = $term->term_id;
+								$term_meta = get_option( "taxonomy_$t_id" );
+								$ao_code = $term_meta['cfar_project_administering_organization_code'];
+							}
+						}
+						if($sponsors){$sponsor_list = join( "; ", $sponsors );}
+						if($programs){$program_list = join( "; ", $programs );}
+						//Get Pi's for this project, first pi in array - pis[0] should be principal
+						$pis = get_users( array(
+							'connected_type' => 'projects_to_pis',
+							'connected_items' => $post,
+						) );
+						//Other pis are coinvestigators
+						$coinvestigators = '';
+						$investigators = '';
+						foreach($pis as $pi) {
+							$coinvestigator_info = '';
+							$investigator_info = '';
+							$role = p2p_get_meta( $pi->p2p_id, 'role', true );
+							if($role == 'Collaborator') {
+								$coinvestigator_info = get_userdata($pi->ID);
+								$coinvestigators .= $coinvestigator_info->last_name .  ', ' . $coinvestigator_info->first_name . ' (' .$coinvestigator_info->organization. ')';
+							} else {
+								$investigator_info = get_userdata($pi->ID);
+								$investigators .= $investigator_info->last_name .  ', ' . $investigator_info->first_name . ' (' .$investigator_info->organization. ')';									
+							}
+						}
+						//Get activity code, serial name for "award supported" field
+						$activity_codes = wp_get_post_terms( $post->ID, 'activity_code', array("fields" => "names") );
+						$serial_number = get_post_meta($post->ID, 'cfar_projects_serial_number', true);
+						$irb = get_post_meta($post->ID, 'cfar_projects_irb_number', true);
+						$pubs = get_post_meta($post->ID, 'cfar_projects_publications_presentations', true);
+						$effort = get_post_meta($post->ID, 'cfar_projects_percent_core_effort', true);
+						/**
+						*  Okay! Let's get those service requests connected to this project!
+						*/
+						$ticket_meta_list = '';
+						$meta = '';
+						$tickets = get_posts( array(
+							'connected_type' => 'tickets_to_projects',
+							'connected_items' => $post
+						) );
+						if(!empty($tickets)) {
+							$ticket_meta_list = '';
+							$meta = '';
+							foreach($tickets as $ticket) {
+								$statuses = '';
+								$t_cores = '';
+								$t_cores = get_the_terms( $ticket->ID, 'core' );
+								$t_core = array_pop($t_cores);
+								$statuses = get_the_terms($ticket->ID, 'status');
+								if(!empty($statuses)) {
+									$status = array_pop($statuses);
+									if($status->slug == 'wpas-close') {
+										if($t_core->slug == 'clinical'){
+											$meta[] = get_post_meta($ticket->ID, 'cfar_clinical_access_uchcc', true);
+											$meta[] = get_post_meta($ticket->ID, 'cfar_clinical_study_coordination', true);
+											$meta[] = get_post_meta($ticket->ID, 'cfar_clinical_other_services', true);
+										}
+										if($t_core->slug == 'clinical-pharmacology'){
+											$meta[] = get_post_meta($ticket->ID, 'cfar_cpharm_services_required', true);
+											$meta[] = get_post_meta($ticket->ID, 'cfar_cpharm_drugs_text', true);
+											$meta[] = get_post_meta($ticket->ID, 'cfar_cpharm_sample_numbers_text', true);
+										}
+									}
+								}
+							}
+							if($meta != ''){$ticket_meta_list = join("; ", $meta);}
+						}
+						//content of project post
+						$content = get_the_content();
+						$results = array();
+						$results[] = $sponsor_list;
+						$results[] = $program_list;
+						$results[] = $investigators;
+						$results[] = $coinvestigators;
+						$results[] = $activity_codes[0].' '.$ao_code.$serial_number;
+						$results[] = $ticket_meta_list;
+						$results[] = $post->post_title; 
+						$results[] = $content;
+						$results[] = $irb.' '.$pubs.' ';
+						$results[] = $effort;
+									foreach ($results as &$value)
 			    {
 				$value = str_replace("\r\n", "", $value);
 				$value = "\"" . $value . "\"";
 			    }
-			$output .= join(',', $results)."\n";
+						$output .= join(',', $results)."\n";
+					}
+				} else {
+					$results[] =  'none';
+				}
+				/* Restore original Post Data */
+				wp_reset_postdata();
+				//var_dump($results);
+				//wp_die();
+
+			//$output .= join(',', $results)."\n";
+			
 			$size_in_bytes = strlen($output);
 			header("Content-type: application/vnd.ms-excel");
-			header("Content-disposition:  attachment; filename=export_data.csv; size=$size_in_bytes");
-			$labels = 'id ,timestamp,pi_name,pi_phone,pi_email,pi_org,pi_other_org,user_name,user_phone,user_email,project_title,project_funding_source,project_funding_source_addendum,project_grant_title,project_grant_number,project_description ,project_irb_approval ,services,other_service,notes_core_service,notes_award_title,percent_effort'."\n";
+			header("Content-disposition:  attachment; filename=$name; size=$size_in_bytes");
+			$labels = 'Sponsor, Program, Investigator (site), Collaborators (site), Award Supported, Core Service, Award Title, Description, "[Outcome Measure (IRB#; Grant Submitted/Awarded; Publications; Presentations)]", % Core Effort'."\r\n";
 			print $labels;
 			print $output;
 			exit;
@@ -459,14 +551,15 @@ function cfar_export_master_function() {
 			$a = array('parent' => 0, 'hide_empty' => true);
 			$top_level_sponsors = get_terms($taxonomy_name, $a);
 			foreach($top_level_sponsors as $top_level_sponsor){
-				$name = $top_level_sponsor->name;
-				$html .= '<tr><td><b>'.$name.'</b></td></tr>';
+				$name = '<tr><td><b>'.$top_level_sponsor->name.'</b></td></tr>';
+				$html .= $name;
 				$children = get_term_children($top_level_sponsor->term_id, $taxonomy_name);
 				// NOT Checking for each unique child... 
 				foreach($children as $child) {
 					$term = get_term_by( 'id', $child, $taxonomy_name );
 					if($term->count != 0) {
-						$html .= '<tr><td><b>'.$term->name.'</b></td></tr>';
+						$program = '<tr><td><b>'.$term->name.'</b></td></tr>';
+						$html .= $program;
 						/**
 						*  Row is added for the top level sponsor above, then the query is run based on projects associated with that sponsor
 						*  
@@ -581,7 +674,10 @@ function cfar_export_master_function() {
 								$html .= '</tr>';
 							}
 						} else {
-							$html .=  '<tr><td>no projects found</td></tr>';
+							//remove top level sponsor name and program from html
+							$html = str_replace($name, null, $html);
+							$html = str_replace($program, null, $html);
+							//$html .=  '<tr><td>no projects found</td></tr>';
 						}
 						/* Restore original Post Data */
 						wp_reset_postdata();
