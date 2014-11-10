@@ -447,7 +447,9 @@ function cfar_export_master_function() {
 						$activity_codes = wp_get_post_terms( $post->ID, 'activity_code', array("fields" => "names") );
 						$serial_number = get_post_meta($post->ID, 'cfar_projects_serial_number', true);
 						$irb = get_post_meta($post->ID, 'cfar_projects_irb_number', true);
+						if($irb){$irb = "[$irb]";}
 						$pubs = get_post_meta($post->ID, 'cfar_projects_publications_presentations', true);
+						if($pubs){$pubs = "[$pubs]";};
 						$effort = get_post_meta($post->ID, 'cfar_projects_percent_core_effort', true);
 						/**
 						*  Okay! Let's get those service requests connected to this project!
@@ -540,7 +542,7 @@ function cfar_export_master_function() {
             <sethtmlpageheader name="header" page="O" value="on" show-this-page="1" />
             <sethtmlpageheader name="header" page="E" value="on" />';*/
 			$html .= '<table>';
-			$html .= '<tr><td>APPENDIX F (TABLE 5) 2013-2014:  CORE C</td></tr>';
+			$html .= '<tr><td>APPENDIX F (TABLE 5) 2013-2014:  CORE '.strtoupper($core).'</td></tr>';
 			$html .= '<tr>';
 			$html .= '<th>Sponsor<br><br> <em>Program</em></th><th>Investigator<br>(site)<br><br> <em>Collaborators (site)</em></th><th>Award Supported</th><th>Core Service</th><th>Award Title<br><br><em>Description of Support/Supported Study</em><br><br>[Outcome Measure (IRB#, Grant Submitted/Awarded, Publications, Presentations)]</th><th>% Core Effort</th>';
 			$html .= '</tr>';
@@ -629,7 +631,9 @@ function cfar_export_master_function() {
 								$activity_codes = wp_get_post_terms( $post->ID, 'activity_code', array("fields" => "names") );
 								$serial_number = get_post_meta($post->ID, 'cfar_projects_serial_number', true);
 								$irb = get_post_meta($post->ID, 'cfar_projects_irb_number', true);
+								if($irb){$irb = "[$irb]";}
 								$pubs = get_post_meta($post->ID, 'cfar_projects_publications_presentations', true);
+								if($pubs){$pubs = "[$pubs]";};
 								$effort = get_post_meta($post->ID, 'cfar_projects_percent_core_effort', true);
 								/**
 								*  Okay! Let's get those service requests connected to this project!
@@ -670,7 +674,7 @@ function cfar_export_master_function() {
 								//content of project post
 								$content = get_the_content();
 								$html .= '<tr>';
-								$html .= '<td>'.$sponsor_list.'</td><td>'.$investigators. '<br><br><em>'.$coinvestigators.'</em></td><td><u>'.$activity_codes[0].' '.$ao_code.$serial_number.'</u></td><td>'.$ticket_meta_list.'<td>' . $post->post_title . '<br><br>'.$content.'<br><br>['.$irb.']<br><br>['.$pubs.']</td><td>'.$effort.'</td>';
+								$html .= '<td>'.$sponsor_list.'</td><td>'.$investigators. '<br><br><em>'.$coinvestigators.'</em></td><td><u>'.$activity_codes[0].' '.$ao_code.$serial_number.'</u></td><td>'.$ticket_meta_list.'<td>' . $post->post_title . '<br><br>'.$content.'<br><br>'.$irb.'<br><br>'.$pubs.'</td><td>'.$effort.'</td>';
 								$html .= '</tr>';
 							}
 						} else {
