@@ -367,6 +367,8 @@ add_action('admin_init', 'cfar_export_master_function');
 function cfar_export_master_function() {
 	global $plugin_page;
 	$core = $_POST['core'];
+	$start_date = $_POST['start-date'];
+	$end_date = $_POST['end-date'];
 	if (isset($_POST['submit']) && $plugin_page == 'export-projects' ) {
 		if($_POST['type'] == 'csv') {
 			$args = array(
@@ -471,13 +473,26 @@ function cfar_export_master_function() {
 						*  $core variable for querying projects only from a certain core, was set by $_POST['core']
 						*  (If core is 'all' the query is set as null value)
 						*
+						*  $date_args are null if both start and end are not set
+						*
 						*/
 						if($core == 'all'){$core = null;}
+						if($start_date == '' && $end_date == '') {
+							$date_args = null;
+						} else {
+							$date_args = array(
+								array(
+									'after'      => $start_date,
+									'before'   => $end_date
+								),
+							);
+						}
 						$args = array(
 							'post_type' => 'projects',
 							'order' => 'ASC',
 							'sponsor' => $term->name,
-							'core' => $core
+							'core' => $core,
+							'date_query' => $date_args
 						);
 						$q = new WP_Query( $args );
 						if ( $q->have_posts() ) {
