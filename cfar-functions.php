@@ -163,8 +163,25 @@ function cfar_import_master_function() {
 		$row = 2;
 		if (($handle = fopen($file, "r")) !== FALSE) {
 		    while (($data = fgetcsv($handle, 1000, "," )) !== FALSE) {
-		    	if($flag) { $flag = false; continue; } //because the first time while loop is entered - the flag is true so it skips code block (does not continue) and runs while loop again
-			$num = count($data);
+		    	$num = count($data);
+			if($num !== 18){
+				$log['error'][] = 'Wrong column formatting. There should be exactly 18 columns.';
+				cfar_print_log_messages($log);
+				return;
+			}		    	
+		    	//Condition to validate column headings are labeled correctly
+		    	if($flag === true) {
+		    		$fields = array('timestamp', 'pi_name', 'pi_phone', 'pi_email', 'pi_org', 'pi_other_org', 'project_title', 'project_funding_source', 'project_funding_source_addendum', 'project_grant_title', 'activity_code', 'serial_number', 'project_grant_number', 'project_description ', 'project_irb_approval ', 'irb_number', 'publications_presentations', 'percent_core_effort');
+		    		for ($c=0; $c < $num; $c++) {
+		    				if($data[$c] != $fields[$c]){
+		    				$log['error'][] = 'Wrong column format. \''.$fields[$c].'\' data should be entered in column labeled \''.$data[$c].'\'. Please reformat .csv file to upload.';
+		    					cfar_print_log_messages($log);
+		    					return;
+		    				}
+		    		}
+		    	}
+		    	//End column heading validation skip row 1 and continue with processing other rows.
+		    	if($flag) { $flag = false; continue; }  //continue is used within looping structures to skip the rest of the current loop iteration and continue execution at the condition evaluation and then the beginning of the next iteration.
 			//echo "<p> $num fields in line $row: <br /></p>\n";
 			$timestamp = $data[0]; 
 			$pi_name = $data[1];
