@@ -48,8 +48,6 @@ require( CFARF_PATH . 'functions/p2p.php' );
 require( CFARF_PATH . 'functions/cmb.php' );
 require( CFARF_PATH . 'functions/taxonomy-meta.php' );
 
-
-
 //Change Details button label in ticket edit screen
 function changeDetailsLabel( $translation, $text ) {
 	global $typenow;
@@ -96,6 +94,96 @@ function get_project_name_fn(){
 }
 add_action('wp_ajax_get_project_name', 'get_project_name_fn');
 add_action('wp_ajax_nopriv_get_project_name', 'get_project_name_fn');
+
+
+/**
+* Removing WPAS admin bar customizations to replace with cfar customization
+*
+* Complicated because admin_bar_menu is one of the last WP hooks to run...
+* it wasn't working to hook remove action to admin_bar_menu or wp_before_admin_bar_render
+*/
+//add_action('admin_bar_menu', 'removeCustomizeAdminBar', 1000);
+//function removeCustomizeAdminBar() {
+global $wpas;
+remove_action( 'admin_bar_menu', array( $wpas, 'CustomizeAdminBar' ), 999 );
+	//$hook_name = 'admin_bar_menu';
+	//global $wp_filter;
+	//echo '<pre>'; print_r($wp_filter[$hook_name]); echo '</pre>';
+	//wp_die();
+//}
+
+add_action( 'admin_bar_menu', 'cfar_customize_admin_bar', 999 );
+function cfar_customize_admin_bar() {
+	global $wpas, $wp_admin_bar, $current_user, $post;
+
+	//$submit 	  = wpas_get_option( 'ticket_submit' );
+	$tickets_page = wpas_get_option( 'ticket_list' );
+
+	/* Does the user want to see all states? */
+	$show = wpas_get_option( 'only_list_open', 'no' );
+
+	/* Get CPT slug */
+	$slug = $wpas->getPostTypeSlug();
+
+	if( 'yes' == $show ) {
+
+		/* Get the open term ID */
+		$term = get_term_by( 'slug', 'wpas-open', 'status' );
+
+		/* Open term ID */
+		$term_id = $term->term_id;
+
+		/* Prepare URL */
+		$url = add_query_arg( array( 'status' => $term_id ), admin_url( 'edit.php?post_type=' . $slug ) );
+
+	} else {
+		$url = admin_url( 'edit.php?post_type=' . $slug );
+	}
+		
+	if( !current_user_can( 'edit_ticket' ) ) {
+
+		$wp_admin_bar->add_menu( array(
+			'id' 	=> 'new-ticket',
+			'title' => __( 'Submit Service Request', 'wpas' ),
+			//'href' 	=> __( get_permalink($submit) )
+			'href' => __(home_url() . '/submit-service-request')
+		) );
+
+		$wp_admin_bar->add_menu( array(
+			'id' 	=> 'my-tickets',
+			'title' => __( 'My Tickets', 'wpas' ),
+			'href' 	=> get_permalink( $tickets_page )
+		) );
+
+	}
+
+	if( current_user_can( 'edit_ticket' ) ) {
+
+		$wp_admin_bar->add_menu( array(
+			'id' 	=> 'all-tickets',
+			'title' => __( 'My Tickets', 'wpas' ),
+			'href' 	=> __( $url )
+		) );
+
+		if( isset( $_GET['action'] ) && 'edit' == $_GET['action'] && 'tickets' == $post->post_type )
+
+		$wp_admin_bar->add_menu( array(
+			'id' 	=> 'wpas-private-note',
+			'title' => __( 'Add Note', 'wpas' ),
+			'href' 	=> '#TB_inline?height=400&amp;width=700&amp;inlineId=wpas-note-modal',
+			'meta'  => array( 'class' => 'wpas-add-note thickbox', 'title' => __( 'Add a private note to this ticket', 'wpas' ) )
+		) );
+
+	}
+
+	$wp_admin_bar->add_menu( array(
+		'id' 	=> 'about-wpas',
+		'parent' => 'wp-logo',
+		'title' => __( 'About WP Awesome Support', 'wpas' ),
+		'href' 	=> 'http://bit.ly/1hYx4Tw'
+	) );
+
+}
 
 //REMOVING WP COMMENTS
 
