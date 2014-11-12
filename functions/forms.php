@@ -170,7 +170,7 @@ function cfar_assign_the_ticket($entry, $form) {
 	//Routing based on Core's main contact	- currently settings for testing
 		switch ($selected_core) {
 		    case "biostatistics":
-			$value = 'mattharris89@gmail.com';
+			$value = 'matt@andisites.com';
 			break;
 		    case "clinical":
 			$value = 'Madison_Hayes@unc.edu';
@@ -179,7 +179,7 @@ function cfar_assign_the_ticket($entry, $form) {
 			$value = 'dani.leah.strauss@gmail.com';
 			break;
 		    case "developmental":
-			$value = 'mattharris89@gmail.com';
+			$value = 'matt@andisites.com';
 			break;	
 		    case "social-behavorial-science":
 			$value = 'Madison_Hayes@unc.edu';
