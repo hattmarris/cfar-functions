@@ -173,19 +173,19 @@ function cfar_assign_the_ticket($entry, $form) {
 			$value = 'matt@andisites.com';
 			break;
 		    case "clinical":
-			$value = 'Madison_Hayes@unc.edu';
+			$value = 'matt@andisites.com';
 			break;
 		    case "clinical-pharmacology":
-			$value = 'dani.leah.strauss@gmail.com';
+			$value = 'matt@andisites.com';
 			break;
 		    case "developmental":
 			$value = 'matt@andisites.com';
 			break;	
 		    case "social-behavorial-science":
-			$value = 'Madison_Hayes@unc.edu';
+			$value = 'matt@andisites.com';
 			break;
 		    case "virology-immunology-microbiology":
-			$value = 'dani.leah.strauss@gmail.com';
+			$value = 'matt@andisites.com';
 			break;			
 		}   
 	$user = get_user_by( $field, $value );	
