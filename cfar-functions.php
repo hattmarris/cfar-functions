@@ -775,7 +775,7 @@ function cfar_export_master_function() {
 								$meta = '';
 								$tickets = get_posts( array(
 									'connected_type' => 'tickets_to_projects',
-									//'date_query' => $date_args,
+									'date_query' => $date_args,
 									'connected_items' => $post
 								) );
 								if(!empty($tickets)) {
