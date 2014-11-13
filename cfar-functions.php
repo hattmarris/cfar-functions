@@ -47,6 +47,7 @@ require( CFARF_PATH . 'functions/cpt.php' );
 require( CFARF_PATH . 'functions/p2p.php' );
 require( CFARF_PATH . 'functions/cmb.php' );
 require( CFARF_PATH . 'functions/taxonomy-meta.php' );
+require( CFARF_PATH . 'functions/tickets-list.php' );
 
 //Change Details button label in ticket edit screen
 function changeDetailsLabel( $translation, $text ) {
