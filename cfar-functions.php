@@ -496,9 +496,7 @@ function cfar_export_master_function() {
 	global $plugin_page;
 	$core = $_POST['core'];
 	$start_date = $_POST['start-date'];
-	$start_date = $start_date . ' 00:00:00';
 	$end_date = $_POST['end-date'];
-	$end_date = $end_date . ' 23:59:59';
 	if (isset($_POST['submit']) && $plugin_page == 'export-projects' ) {
 		if($_POST['type'] == 'csv') {
 			$timestamp = time();
@@ -516,6 +514,8 @@ function cfar_export_master_function() {
 				if($start_date == '' && $end_date == '') {
 					$date_args = null;
 				} else {
+					$start_date = $start_date . ' 00:00:00';
+					$end_date = $end_date . ' 23:59:59';
 					$date_args = array(
 						array(
 							'after'      => $start_date,
@@ -706,6 +706,8 @@ function cfar_export_master_function() {
 						if($start_date == '' && $end_date == '') {
 							$date_args = null;
 						} else {
+							$start_date = $start_date . ' 00:00:00';
+							$end_date = $end_date . ' 23:59:59';
 							$date_args = array(
 								array(
 									'after'      => $start_date,
@@ -773,7 +775,7 @@ function cfar_export_master_function() {
 								$meta = '';
 								$tickets = get_posts( array(
 									'connected_type' => 'tickets_to_projects',
-									'date_query' => $date_args,
+									//'date_query' => $date_args,
 									'connected_items' => $post
 								) );
 								if(!empty($tickets)) {
