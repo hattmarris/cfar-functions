@@ -212,6 +212,90 @@ if ( !function_exists('create_activity_code_taxonomy') ) {
 		
 }
 
+/**
+* Creates Custom Tickets Services Taxonomy 
+*/ 
+add_action( 'init', 'create_services_taxonomy' );
+
+if ( !function_exists('create_services_taxonomy') ) {
+
+	function create_services_taxonomy() {
+		/******* Ticket Service Post Taxonomy *******/
+		// Add new taxonomy, make it hierarchical 
+		$labels = array(
+			'name'              => _x( 'Services', 'taxonomy general name' ),
+			'singular_name'     => _x( 'Service', 'taxonomy singular name' ),
+			'search_items'      => __( 'Search Services' ),
+			'all_items'         => __( 'All Services' ),
+			'parent_item'       => __( 'Parent Service' ),
+			'parent_item_colon' => __( 'Parent Service:' ),
+			'edit_item'         => __( 'Edit Service' ),
+			'update_item'       => __( 'Update Service' ),
+			'add_new_item'      => __( 'Add New Service' ),
+			'new_item_name'     => __( 'New Service Name' ),
+			'menu_name'         => __( 'Services' ),
+		);
+		
+		$args = array(
+		'hierarchical'      => true,
+		'labels'            => $labels,
+		'show_ui'           => true,
+		'show_admin_column' => true,
+		'query_var'         => true,
+		'rewrite'           => array( 'slug' => 'service' ),
+	);
+	
+	register_taxonomy( 'service', array ('tickets'), $args );
+	
+	register_taxonomy_for_object_type( 'service', 'tickets' );
+	
+	}
+		
+}
+
+/**
+* Creates Custom Tickets Services Taxonomy Default Terms
+*/ 
+add_action( 'init', 'create_services_taxonomy_default_terms');
+
+if (!function_exists('create_services_taxonomy_default_terms')) {
+	
+	function create_services_taxonomy_default_terms() {
+		$taxonomy = 'service';
+		$terms = array('C', 'E/S', 'M', 'S', 'T', 'O');
+		$num = count($terms);
+		$args = array(
+				array(
+					'description' => 'Consultation / mentorship',
+					'slug' => 'consultation-mentorship'
+				),
+				array(
+					'description' => 'Equipment or space',
+					'slug' => 'equipment-or-space'
+				),
+				array(
+					'description' => 'Materials',
+					'slug' => 'materials'
+				),
+				array(
+					'description' => 'Services',
+					'slug' => 'services'
+				),
+				array(
+					'description' => 'Training',
+					'slug' => 'training'
+				),
+				array(
+					'description' => 'Other',
+					'slug' => 'other'
+				)				
+			);
+		for($c=0; $c < $num; $c++) {
+			wp_insert_term($terms[$c], $taxonomy, $args[$c]);
+		}
+	}
+}
+
 /* Creates Menu icon*/
 function cfar_cpt_menu_icon_styles(){
 ?>
