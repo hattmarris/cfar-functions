@@ -476,10 +476,28 @@ function cfar_projects_metaboxes( $meta_boxes ) {
 	        'type' => 'text'
 	    ),
 	    array(
+	        'name' => 'Project / Grant Number',
+	        'desc' => 'A general text field for numbers & codes associated with this project/grant.',
+	        'id' => $prefix . 'grant_number',
+	        'type' => 'text_medium'
+	    ),
+	    array(
 	        'name' => 'Serial Number',
-	        'desc' => 'Put the NIH serial number here if applicable. The administering organization code will be appended based on your sponsor selection.',
+	        'desc' => 'Put the NIH serial number (# only) here if applicable. The administering organization code will be appended based on your sponsor selection for table 5 reporting.',
 	        'id' => $prefix . 'serial_number',
 	        'type' => 'text_small'
+	    ),
+	    array(
+	        'name' => 'IRB Approval',
+	        'desc' => 'Enter IRB approval status if applicable.',
+	        'id' => $prefix . 'irb_approval',
+	        'type' => 'select',
+	        'options' => array(
+	        		'Yes' => 'Yes',
+	        		'Pending' => 'Pending',
+	        		'N/A' => 'N/A'
+	        	),
+	        'default' => 'N/A'
 	    ),
 	    array(
 	        'name' => 'IRB Number',
@@ -783,7 +801,7 @@ function cfar_wpas_ticket_details_mb() {
 	    	  //Issue 2 nonce on projects CMB field - CMB class checks nonce already I believe
 	}
 /**
-*  Changing Post date when ticket is marked closed
+*  Checking to see if they've set a service for reporting on ticket, and Changing Post date when ticket is marked closed
 */	
 	add_action( 'save_post', 'cfar_update_ticket_date_on_close', 9, 2 );
 	function cfar_update_ticket_date_on_close($post_id, $post) {
@@ -814,7 +832,14 @@ function cfar_wpas_ticket_details_mb() {
 		
 		if($_POST['status']=='wpas-close') {
 			if($curr_status == 'wpas-open') {
-				//We're going from open to close, so we can save a new time on the post_date of this ticket.
+				//We're going from open to close, so we can check to see if they've categorized it as a service and save a new time on the post_date of this ticket.
+				$service = $_POST['tax_input']['service'];
+				$service = array_filter($service);
+				if(!has_term( 'service', $post_id ) && empty($service)) {
+					$url = admin_url()."post.php?post=$post_id&action=edit&message=service-error";
+					wp_redirect($url);
+					exit;
+				}
 				$timestamp = time();
 				$date = gmdate("Y-m-d H:i:s", $timestamp);
 				global $wpdb;
@@ -822,6 +847,24 @@ function cfar_wpas_ticket_details_mb() {
 			}
 		}
 	}
+
+/**
+*  Error message if service is not set, and user is redirected back to edit page on save
+*/	
+add_action('admin_init', 'cfar_ticket_service_error_message');
+function cfar_ticket_service_error_message() {
+	global $pagenow;
+	if($pagenow == 'post.php' && $_GET['action']['edit']){
+		if(isset($_GET['message']['service-error'])) {
+			   $log['error'][] = "You must first set a <a href='".admin_url()."edit-tags.php?taxonomy=service&post_type=tickets'>service</a> for this ticket before setting status to closed.  
+			   This information is used when generating table 5 reports on projects with connected tickets, in order to populate the \"Core Service\" column.";
+			   cfar_print_log_messages($log);
+			   return; 
+		}
+
+	}
+}
+	
 /**
 *  Adding timestamps to Publish box for tickets
 */
