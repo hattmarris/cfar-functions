@@ -86,9 +86,14 @@ function get_project_name_fn(){
 		  'nopaging' => true
 		) );
     $items = array();
-    $items[] = array( "text" => __('Select project...','theme'), "value" => 'default' );
+    $items[] = array( "text" => __('Select grant / project...','theme'), "value" => 'default' );
     foreach($projects as $project){
-        $items[] = array( "text" => $project->post_title, "value" => $project->ID );
+    	$grant = get_post_meta($project->ID, 'cfar_projects_grant_title', true);    
+    	if($grant != '') {
+    		$items[] = array( "text" => $grant, "value" => $project->ID );
+    	} else {
+    		$items[] = array( "text" => $project->post_title, "value" => $project->ID );
+        }
     }
     echo json_encode($items);
     die;
