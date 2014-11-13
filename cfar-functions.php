@@ -350,7 +350,7 @@ function cfar_process_csv_create_project_user($core, $date, $row, $pi_name, $pi_
 	       $random_password = wp_generate_password( $length=12, $include_standard_special_chars=false );
 	       $user_id = wp_create_user( $user_name, $random_password, $pi_email );
 	       $full_name = explode(" ", $pi_name);
-	       wp_update_user( array ('ID' => $user_id, 'first_name'=> $full_name[0], 'last_name'=> $full_name[1], 'role'=> 'principal_investigator') ) ;
+	       wp_update_user( array ('ID' => $user_id, 'display_name' => $pi_name, 'first_name'=> $full_name[0], 'last_name'=> $full_name[1], 'role'=> 'principal_investigator') ) ;
 	       update_user_meta( $user_id, 'organization', $pi_org );
 	       update_user_meta( $user_id, 'other_org', $pi_other_org );
 	       update_user_meta( $user_id, 'phone', $pi_phone );
