@@ -291,7 +291,7 @@ if (!function_exists('create_services_taxonomy_default_terms')) {
 				)				
 			);
 		for($c=0; $c < $num; $c++) {
-			if(!term_exists( $terms[$c], $taxonomy) {
+			if(!term_exists( $terms[$c], $taxonomy)) {
 					wp_insert_term($terms[$c], $taxonomy, $args[$c]);
 			}
 		}
