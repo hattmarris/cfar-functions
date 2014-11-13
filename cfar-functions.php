@@ -185,6 +185,23 @@ function cfar_customize_admin_bar() {
 
 }
 
+/**
+* Removing WPAS singleTemplate in order to add cores as column properly in cfar plugin, not theme
+*
+*/
+remove_action( 'template_redirect', array( $wpas, 'singleTemplate' ) );
+add_action( 'template_redirect', 'cfar_singleTemplate' );
+/**
+ * Get the new single ticket template for front-end
+ */
+function cfar_singleTemplate() {
+	global $post;
+	if( is_single() && 'tickets' == $post->post_type ) {
+			include( CFARF_PATH . 'templates/single-tickets.php' );
+			exit();
+	}
+}
+
 //REMOVING WP COMMENTS
 
 // Removes from admin menu
