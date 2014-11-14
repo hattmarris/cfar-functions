@@ -586,11 +586,31 @@ function cfar_export_master_function() {
 						*/
 						$ticket_meta_list = '';
 						$meta = '';
+						$core_services_list = '';
+						$core_services = array();
+						$services = array();
 						$tickets = get_posts( array(
 							'connected_type' => 'tickets_to_projects',
 							'date_query' => $date_args,
+							'status' => 'wpas-close',
 							'connected_items' => $post
 						) );
+						if(!empty($tickets)){
+								foreach($tickets as $ticket){
+									$services = get_the_terms($ticket->ID, 'service');
+									if (is_array($services)) {
+										foreach($services as $service) {
+											$service_name = $service->name;
+											if (!in_array($service_name, $core_services)) {
+												$core_services[] = $service_name;
+											}
+										}
+									}											
+								}
+						$core_services = array_filter($core_services);		
+						}
+						if(!empty($core_services)){$core_services_list = join("; ", $core_services);}
+						/*
 						if(!empty($tickets)) {
 							$ticket_meta_list = '';
 							$meta = '';
@@ -617,7 +637,7 @@ function cfar_export_master_function() {
 								}
 							}
 							if($meta != ''){$ticket_meta_list = join("; ", $meta);}
-						}
+						}*/
 						//content of project post
 						$content = get_the_content();
 						$results = array();
@@ -626,7 +646,7 @@ function cfar_export_master_function() {
 						$results[] = $investigators;
 						$results[] = $coinvestigators;
 						$results[] = $activity_codes[0].' '.$ao_code.$serial_number;
-						$results[] = $ticket_meta_list;
+						$results[] = $core_services_list;
 						$results[] = $post->post_title; 
 						$results[] = $content;
 						$results[] = $irb.' '.$pubs.' ';
