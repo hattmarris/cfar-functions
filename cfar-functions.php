@@ -76,13 +76,17 @@ function changeDetailsLabel( $translation, $text ) {
 add_filter( 'gettext', 'changeDetailsLabel', 10, 2 );
 
 
-// Process ajax Call from Service Request Form
+/** 
+* Process ajax Call from Service Request Form
+*/
 function get_project_name_fn(){
     $projectPi = $_POST['projectPi'];
+    $core = $_POST['core'];
     $projects = get_posts( array(
 		  'connected_type' => 'projects_to_pis',
 		  'connected_items' => $projectPi,
 		  'suppress_filters' => false,
+		  'core' => $core,
 		  'nopaging' => true
 		) );
     $items = array();

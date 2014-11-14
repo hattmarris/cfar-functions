@@ -70,7 +70,7 @@ add_filter("gform_pre_render", "add_project_filter_javascript");
 add_filter("gform_admin_pre_render", "add_project_filter_javascript");
 function add_project_filter_javascript($form) { ?>
 	<script type="text/javascript">
-	function projectFilter() {
+	function projectFilter() {	
 		var piClass = '.populate-pi select',
 		    projectClass  = '.project-name select';
 		
@@ -78,21 +78,21 @@ function add_project_filter_javascript($form) { ?>
 			var piSelect = jQuery(this),
 			    pi = piSelect.val(),
 			    projectSelect = piSelect.parents('form').find(projectClass);
-			    
-			    console.log(projectSelect);
+			    var core = jQuery('input[name=input_79]:checked', '#gform_2').val();
+			    console.log(core);
 		
 			if(pi != "default") {
 		
 			    jQuery.ajax({
 				type: 'POST',
 				url: '<?php echo admin_url('admin-ajax.php'); ?>',
-				data: { projectPi : pi, action: 'get_project_name' },
+				data: { core : core, projectPi : pi, action: 'get_project_name' },
 				success: function(data){
 				    projectSelect.empty();
 				    var options = jQuery.parseJSON(data);
 				    for(i=0; i<options.length; i++){
 					projectSelect.append('<option value="'+options[i].value+'">'+options[i].text+'</option>');
-					console.log(options[i].text);
+					//console.log(options[i].text);
 				    }
 				    projectSelect.removeAttr('disabled');
 				}
