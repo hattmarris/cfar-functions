@@ -855,7 +855,7 @@ add_action('admin_init', 'cfar_ticket_service_error_message');
 function cfar_ticket_service_error_message() {
 	global $pagenow;
 	if($pagenow == 'post.php' && $_GET['action']['edit']){
-		if(isset($_GET['message']['service-error'])) {
+		if(isset($_GET['message']) && $_GET['message'] == 'service-error') {
 			   $log['error'][] = "You must first set a <a href='".admin_url()."edit-tags.php?taxonomy=service&post_type=tickets'>service</a> for this ticket before setting status to closed.  
 			   This information is used when generating table 5 reports on projects with connected tickets, in order to populate the \"Core Service\" column.";
 			   cfar_print_log_messages($log);
