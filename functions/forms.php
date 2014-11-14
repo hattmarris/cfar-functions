@@ -72,10 +72,11 @@ function add_project_filter_javascript($form) { ?>
 	<script type="text/javascript">
 	function projectFilter() {	
 		var piClass = '.populate-pi select',
+		    coreClass = '.core',
 		    projectClass  = '.project-name select';
-		
-		jQuery(piClass).change(function(){
-			var piSelect = jQuery(this),
+		    
+		var masterFilter =  function() {
+			var piSelect = jQuery(piClass),
 			    pi = piSelect.val(),
 			    projectSelect = piSelect.parents('form').find(projectClass);
 			    var core = jQuery('input[name=input_79]:checked', '#gform_2').val();
@@ -98,9 +99,10 @@ function add_project_filter_javascript($form) { ?>
 				}
 			    });
 		
-			}
-		
-		});
+			}	
+		}	    
+		jQuery(piClass).change(masterFilter);
+		jQuery(coreClass).change(masterFilter);
 	}
 	</script>
 	<script type="text/javascript">
