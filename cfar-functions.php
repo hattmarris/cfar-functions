@@ -787,6 +787,11 @@ function cfar_export_master_function() {
 								//Get activity code, serial name for "award supported" field
 								$activity_codes = wp_get_post_terms( $post->ID, 'activity_code', array("fields" => "names") );
 								$serial_number = get_post_meta($post->ID, 'cfar_projects_serial_number', true);
+								if(!empty($activity_codes) && isset($serial_number)) {
+									$project_number = '<u>'.$activity_codes[0].' '.$ao_code.$serial_number.'</u>';
+								} else {
+									$project_number = '<u>'.get_post_meta($post->ID, 'cfar_projects_grant_number', true).'</u>';										
+								}
 								$irb = get_post_meta($post->ID, 'cfar_projects_irb_number', true);
 								if($irb){$irb = "[$irb]";}
 								$pubs = get_post_meta($post->ID, 'cfar_projects_publications_presentations', true);
@@ -850,9 +855,15 @@ function cfar_export_master_function() {
 									if($meta != ''){$ticket_meta_list = join("; ", $meta);}
 								}*/
 								//content of project post
+								$grant = get_post_meta($post->ID, 'cfar_projects_grant_title', true);
+								if($grant != '') {
+									$title = $grant;
+								} else {
+									$title = $post->post_title;
+								}
 								$content = get_the_content();
 								$html .= '<tr>';
-								$html .= '<td>'.$sponsor_list.'</td><td>'.$investigators. '<br><br><em>'.$coinvestigators.'</em></td><td><u>'.$activity_codes[0].' '.$ao_code.$serial_number.'</u></td><td>'.$core_services_list.'<td>' . $post->post_title . '<br><br>'.$content.'<br><br>'.$irb.'<br><br>'.$pubs.'</td><td>'.$effort.'</td>';
+								$html .= '<td>'.$sponsor_list.'</td><td>'.$investigators. '<br><br><em>'.$coinvestigators.'</em></td><td>'.$project_number.'</td><td>'.$core_services_list.'<td>' . $title . '<br><br>'.$content.'<br><br>'.$irb.'<br><br>'.$pubs.'</td><td>'.$effort.'</td>';
 								$html .= '</tr>';
 							}
 						} else {
