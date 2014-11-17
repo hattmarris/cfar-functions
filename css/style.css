@@ -1,0 +1,231 @@
+/*
+* Stylesheet for MPDF table 5 export feature
+*/
+
+body {
+	font-family: arial, sans-serif;
+	font-size: 10pt;
+	text-indent: 0pt;
+	line-height: normal;
+	margin-collapse: collapse; /* custom property to collapse top/bottom margins at top/bottom of page - ignored in tables/lists */
+	hyphens: manual;	/* mpdf 5.6.08 */
+}
+p {
+	margin: 1.12em 0;
+}
+h1 {
+	font-size: 2em;
+	font-weight: bold;
+	margin: 0.67em 0;
+	page-break-after: avoid;
+}
+h2 {
+	font-size: 1.5em;
+	font-weight: bold;
+	margin: 0.75em 0;
+	page-break-after: avoid;
+}
+h3 {
+	font-size: 1.17em;
+	font-weight: bold;
+	margin: 0.83em 0;
+	page-break-after: avoid;
+}
+h4 {
+	font-weight: bold;
+	margin: 1.12em 0;
+	page-break-after: avoid;
+}
+h5 {
+	font-size: 0.83em;
+	font-weight: bold;
+	margin: 1.5em 0;
+	page-break-after: avoid;
+}
+h6 {
+	font-size: 0.75em;
+	font-weight: bold;
+	margin: 1.67em 0;
+	page-break-after: avoid;
+}
+hr {
+	color: #888888;
+	text-align: center;
+	width: 100%;
+	height: 0.2mm;
+	margin-top: 0.83em;
+	margin-bottom: 0.83em;
+}
+pre {
+	margin: 0.83em 0;
+	font-family: monospace;
+}
+s {
+	text-decoration: line-through;
+}
+strike {
+	text-decoration: line-through;
+}
+del {
+	text-decoration: line-through;
+}
+sub {
+	vertical-align: sub;
+	font-size: 55%;	/* recommended 0.83em */
+}
+sup {
+	vertical-align: super;
+	font-size: 55%;	/* recommended 0.83em */
+}
+u {
+	text-decoration: underline;
+}
+ins {
+	text-decoration: underline;
+}
+b {
+	font-weight: bold;
+}
+strong {
+	font-weight: bold;
+}
+i {
+	font-style: italic;
+}
+cite {
+	font-style: italic;
+}
+q {
+	font-style: italic;
+}
+em {
+	font-style: italic;
+}
+var {
+	font-style: italic;
+}
+samp {
+	font-family: monospace;
+}
+code {
+	font-family: monospace;
+}
+kbd {
+	font-family: monospace;
+}
+tt {
+	font-family: monospace;
+}
+small {
+	font-size: 83%;
+}
+big {
+	font-size: 117%;
+}
+acronym {
+	font-size: 77%;
+	font-weight: bold;
+}
+address {
+	font-style: italic;
+}
+blockquote {
+	margin-left: 40px;
+	margin-right: 40px;
+	margin-top: 1.12em;
+	margin-bottom: 1.12em;
+}
+a {
+	color: #0000ff;
+	text-decoration: underline;
+}
+ul {
+	margin: 0.83em 0;		/* only applied to top-level of nested lists */
+	text-indent: 1.3em;	/* custom effect - list indent */
+}
+ol {
+	margin: 0.83em 0;		/* only applied to top-level of nested lists */
+	text-indent: 1.3em;	/* custom effect - list indent */
+}
+dl {
+	margin: 1.67em 0;
+}
+dt {
+}
+dd {
+	padding-left: 40px;
+}
+table {
+	margin: 0;
+	border-collapse: collapse;
+	border-spacing: 2px;
+	empty-cells: show;
+	line-height: 1.2;
+	vertical-align: middle;
+}
+thead {
+}
+tfoot {
+}
+th {
+	font-weight: bold;
+	text-align: center;
+	padding-left: 0.1em;
+	padding-right: 0.1em;
+	padding-top: 0.1em;
+	padding-bottom: 0.1em;
+}
+td {
+	padding-left: 0.1em;
+	padding-right: 0.1em;
+	padding-top: 0.1em;
+	padding-bottom: 0.1em;
+}
+caption {
+	text-align: center;
+}
+img {
+	margin: 0;
+	vertical-align: baseline;
+}
+input {
+	font-family: sans-serif;
+	vertical-align: middle;
+	font-size: 0.9em;
+}
+select {
+	font-family: sans-serif;
+	font-size: 0.9em;
+	vertical-align: middle;
+}
+textarea {
+	font-family: monospace;
+	font-size: 0.9em;
+	vertical-align: text-bottom;
+}
+mark {	/* mpdf 5.5.09 */
+	background-color: yellow;
+}
+
+/* Table 5 */
+#table-5 td, #table-5 th {
+	border: 1pt solid #000000;
+	padding:3px 7px 2px 7px;
+}
+
+#table-5 th, 
+#table-5 .sponsor {
+	background-color: #F3F3F3;
+}
+
+#table-5 td {
+	vertical-align: top;
+}
+
+#table-5 .sponsor-child {
+	background-color: #F1EFE8;
+}
+
+#table-5 .center {
+	text-align: center;
+}

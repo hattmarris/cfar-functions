@@ -685,22 +685,11 @@ function cfar_export_master_function() {
 		*/
 		if($_POST['type'] == 'pdf') {
 			$html = '<body style="font-family: arial, sans-serif; font-size: 10pt;">';
-			/*$html .= '<table><htmlpageheader name="header">';
-			$html .= '<h1>Table 5</h1>';
-			$html .= '<table>';
-			$html .= '<tr><td>APPENDIX F (TABLE 5) 2013-2014:  CORE C</td></tr>';
+			$html .= '<table id="table-5"><thead>';
+			$html .= '<tr><th colspan="6" class="center">APPENDIX F (TABLE 5) 2013-2014:  CORE '.strtoupper($core).'</th></tr>';
 			$html .= '<tr>';
-			$html .= '<th>Sponsor<br><br> <em>Program</em></th><th>Investigator<br>(site)<br><br> <em>Collaborators (site)</em></th><th>Award Supported</th><th>Core Service</th><th>Award Title<br><br><em>Description of Support/Supported Study</em><br><br>[Outcome Measure (IRB#, Grant Submitted/Awarded, Publications, Presentations)]</th><th>% Core Effort</th>';
-			$html .= '</tr>';
-			$html .= '</table>';
-			$html .= '</htmlpageheader>
-            <sethtmlpageheader name="header" page="O" value="on" show-this-page="1" />
-            <sethtmlpageheader name="header" page="E" value="on" />';*/
-			$html .= '<table>';
-			$html .= '<tr><td>APPENDIX F (TABLE 5) 2013-2014:  CORE '.strtoupper($core).'</td></tr>';
-			$html .= '<tr>';
-			$html .= '<th>Sponsor<br><br> <em>Program</em></th><th>Investigator<br>(site)<br><br> <em>Collaborators (site)</em></th><th>Award Supported</th><th>Core Service</th><th>Award Title<br><br><em>Description of Support/Supported Study</em><br><br>[Outcome Measure (IRB#, Grant Submitted/Awarded, Publications, Presentations)]</th><th>% Core Effort</th>';
-			$html .= '</tr>';
+			$html .= '<th>Sponsor<br><br> <em>Program</em></th><th>Investigator<br>(site)<br><br> <em>Collaborators (site)</em></th><th>Award Supported</th><th>Core Service</th><th>Award Title<br><br><em>Description of Support/Supported Study</em><br><br>[Outcome Measure (IRB#, Grant Submitted/Awarded, Publications, Presentations)]</th><th>% Core Effort (Avg)</th>';
+			$html .= '</tr></thead>';
 			/**
 			*  Get Top level Sponsor Terms Which is How the Table 5 list of projects / grants is divided beyond core divisions - May need to Add Core as shared taxonomy for projects
 			*/
@@ -708,14 +697,14 @@ function cfar_export_master_function() {
 			$a = array('parent' => 0, 'hide_empty' => true);
 			$top_level_sponsors = get_terms($taxonomy_name, $a);
 			foreach($top_level_sponsors as $top_level_sponsor){
-				$name = '<tr><td><b>'.$top_level_sponsor->name.'</b></td></tr>';
+				$name = '<tr><td colspan="6" class="sponsor"><b>'.$top_level_sponsor->name.'</b></td></tr>';
 				$html .= $name;
 				$children = get_term_children($top_level_sponsor->term_id, $taxonomy_name);
 				// NOT Checking for each unique child... 
 				foreach($children as $child) {
 					$term = get_term_by( 'id', $child, $taxonomy_name );
 					if($term->count != 0) {
-						$program = '<tr><td><b>'.$term->name.'</b></td></tr>';
+						$program = '<tr><td colspan="6" class="sponsor-child"><b>'.$term->name.'</b></td></tr>';
 						$html .= $program;
 						/**
 						*  Row is added for the top level sponsor above, then the query is run based on projects associated with that sponsor
@@ -881,12 +870,14 @@ function cfar_export_master_function() {
 			//==============================================================
 			//==============================================================
 			$html .= '</table><body>';
+			$stylesheet = file_get_contents(CFARF_PATH . "css/style.css");
 			include(CFARF_PATH . "lib/mpdf/mpdf.php");
 			
 			$mpdf=new mPDF(); 
 			$mpdf->AddPage('L');
 			$mpdf->SetHTMLHeaderByName('header');
-			$mpdf->WriteHTML($html);
+			$mpdf->WriteHTML($stylesheet,1);
+			$mpdf->WriteHTML($html,2);
 			$mpdf->Output();
 			exit;
 			
