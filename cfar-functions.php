@@ -518,12 +518,12 @@ function cfar_export_master_function() {
 				if($start_date == '' && $end_date == '') {
 					$date_args = null;
 				} else {
-					$start_date = $start_date . ' 00:00:00';
-					$end_date = $end_date . ' 23:59:59';
+					$start = $start_date . ' 00:00:00';
+					$end = $end_date . ' 23:59:59';
 					$date_args = array(
 						array(
-							'after'      => $start_date,
-							'before'   => $end_date,
+							'after'      => $start,
+							'before'   => $end,
 							'inclusive' => true,
 						),
 					);
@@ -719,15 +719,16 @@ function cfar_export_master_function() {
 						if($start_date == '' && $end_date == '') {
 							$date_args = null;
 						} else {
-							$start_date = $start_date . ' 00:00:00';
-							$end_date = $end_date . ' 23:59:59';
+							$start = $start_date . ' 00:00:00';
+							$end = $end_date . ' 23:59:59';
 							$date_args = array(
 								array(
-									'after'      => $start_date,
-									'before'   => $end_date
+									'after'      => $start,
+									'before'   => $end
 								),
 							);
 						}
+						//echo '<pre>'; print_r($date_args); echo '</pre>';
 						$args = array(
 							'post_type' => 'projects',
 							'order' => 'ASC',
@@ -735,7 +736,7 @@ function cfar_export_master_function() {
 							'core' => $core,
 							'date_query' => $date_args
 						);
-						$q = new WP_Query( $args );
+						$q = new WP_Query( $args );					
 						if ( $q->have_posts() ) {
 							while ( $q->have_posts() ) {
 								$q->the_post();
