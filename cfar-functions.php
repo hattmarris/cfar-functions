@@ -728,7 +728,6 @@ function cfar_export_master_function() {
 								),
 							);
 						}
-						//echo '<pre>'; print_r($date_args); echo '</pre>';
 						$args = array(
 							'post_type' => 'projects',
 							'order' => 'ASC',
