@@ -495,14 +495,58 @@ function cfar_export_project_data() {
 	require_once( CFARF_PATH . 'functions/export/export-projects-admin.php' );
 }
 
-add_action('admin_init', 'cfar_export_master_function');
+add_action('admin_init', 'cfar_export_master_function', 11);
 function cfar_export_master_function() {
 	global $plugin_page;
-	$core = $_POST['core'];
-	$start_date = $_POST['start-date'];
-	$end_date = $_POST['end-date'];
 	if (isset($_POST['submit']) && $plugin_page == 'export-projects' ) {
+		
+		//Define Inputs
+		$core = $_POST['core'];
+		if($core == 'all'){$core = null;}
+		$start_date = $_POST['start-date'];
+		$end_date = $_POST['end-date'];
+		$letter = cfar_get_core_letter($core);
+		$date_args = cfar_get_export_date_args($start_date, $end_date);
+		
+		//CSV or PDF
 		if($_POST['type'] == 'csv') {
+			cfar_export_table_5_csv($core, $letter, $date_args);
+		}
+		if($_POST['type'] == 'pdf') {
+			cfar_export_table_5_pdf($core, $letter, $date_args);
+		}
+	}
+}
+
+function cfar_get_core_letter($core) {
+	$core_object = get_term_by('slug', $core , 'core');
+	$core_id = (int) $core_object->term_id;
+	$core_meta = get_option( "taxonomy_$core_id" );
+	$core_letter = $core_meta['cfar_core_letter'];
+return $core_letter;
+}
+
+function cfar_get_export_date_args($start_date, $end_date) {
+	if($start_date == '' && $end_date == '') {
+		$args = null;
+	} else {
+		$start = $start_date . ' 00:00:00';
+		$end = $end_date . ' 23:59:59';
+		$args = array(
+			array(
+				'after'      => $start,
+				'before'   => $end,
+				'inclusive' => true,
+			),
+		);
+	}
+return $args;	
+}
+
+/**
+* Begin CSV export block
+*/
+function cfar_export_table_5_csv($core, $letter, $date_args) {
 			$timestamp = time();
 			$date = gmdate("Y-m-d", $timestamp);
 			$name = 'table5_export_' . $core . '_' . $date . '.csv';
@@ -514,20 +558,6 @@ function cfar_export_master_function() {
 				*  $date_args are null if both start and end are not set
 				*
 				*/
-				if($core == 'all'){$core = null;}
-				if($start_date == '' && $end_date == '') {
-					$date_args = null;
-				} else {
-					$start = $start_date . ' 00:00:00';
-					$end = $end_date . ' 23:59:59';
-					$date_args = array(
-						array(
-							'after'      => $start,
-							'before'   => $end,
-							'inclusive' => true,
-						),
-					);
-				}
 				$args = array(
 					'post_type' => 'projects',
 					'order' => 'ASC',
@@ -679,14 +709,16 @@ function cfar_export_master_function() {
 			print $labels;
 			print $output;
 			exit;
-		}
-		/**
-		* Begin PDF export Query block
-		*/
-		if($_POST['type'] == 'pdf') {
+}
+
+/**
+* Begin PDF export Query block
+*/
+function cfar_export_table_5_pdf($core, $letter, $date_args) {
 			$html = '<body style="font-family: arial, sans-serif; font-size: 10pt;">';
+			$html .= '<p>'.strtoupper('CORE ' .$letter).'</p>';
 			$html .= '<table id="table-5"><thead>';
-			$html .= '<tr><th colspan="6" class="center">APPENDIX F (TABLE 5) 2013-2014:  CORE '.strtoupper($core).'</th></tr>';
+			$html .= '<tr><th colspan="6" class="center">APPENDIX F (TABLE 5) 2013-2014:  CORE '.strtoupper($letter).'</th></tr>';
 			$html .= '<tr>';
 			$html .= '<th>Sponsor<br><br> <em>Program</em></th><th>Investigator<br>(site)<br><br> <em>Collaborators (site)</em></th><th>Award Supported</th><th>Core Service</th><th>Award Title<br><br><em>Description of Support/Supported Study</em><br><br>[Outcome Measure (IRB#, Grant Submitted/Awarded, Publications, Presentations)]</th><th>% Core Effort (Avg)</th>';
 			$html .= '</tr></thead>';
@@ -715,19 +747,6 @@ function cfar_export_master_function() {
 						*  $date_args are null if both start and end are not set
 						*
 						*/
-						if($core == 'all'){$core = null;}
-						if($start_date == '' && $end_date == '') {
-							$date_args = null;
-						} else {
-							$start = $start_date . ' 00:00:00';
-							$end = $end_date . ' 23:59:59';
-							$date_args = array(
-								array(
-									'after'      => $start,
-									'before'   => $end
-								),
-							);
-						}
 						$args = array(
 							'post_type' => 'projects',
 							'order' => 'ASC',
@@ -883,8 +902,6 @@ function cfar_export_master_function() {
 			
 			//==============================================================
 			//==============================================================
-			//==============================================================
-		}
-	}
+			//==============================================================	
 }
 ?>
