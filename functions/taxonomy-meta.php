@@ -57,6 +57,25 @@ function cfar_save_taxonomy_core_letter_meta( $term_id ) {
 add_action( 'edited_core', 'cfar_save_taxonomy_core_letter_meta', 10, 2 );  
 add_action( 'create_core', 'cfar_save_taxonomy_core_letter_meta', 10, 2 );
 
+/**
+* Add Core letter column to manage core taxonomy screen
+*/
+
+//Add Extra User Columns to All Users Screen
+function cfar_add_extra_core_letter_column( $columns ) {
+    $columns['cfar-edit-column-core-letter'] = __('Letter', 'cfar_core_letter');
+    unset($columns['description']);
+    return $columns;
+}
+function cfar_custom_column_core_letter($value, $column_name, $id) {	
+   if( $column_name == 'cfar-edit-column-core-letter' ) {
+   	$term_meta = get_option( "taxonomy_$id" );
+        return $term_meta['cfar_core_letter'];
+   }
+}
+add_action('manage_core_custom_column', 'cfar_custom_column_core_letter', 15, 3);
+add_filter('manage_edit-core_columns' , 'cfar_add_extra_core_letter_column', 15, 1);
+
 
 /**
 * Meta information about NIH sponsor codes
