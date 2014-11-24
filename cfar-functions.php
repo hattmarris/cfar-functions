@@ -345,9 +345,13 @@ function cfar_process_csv_create_project_user($core, $date, $row, $pi_name, $pi_
 	   return;
        }
        elseif (email_exists($pi_email)) {
-	   $log['error'][] = "Email: ".$pi_email." already in use. Check and fix row: " . $row . " of .csv file to upload user.";
-	   cfar_print_log_messages($log);
-	   return;       	       
+	   //$log['error'][] = "Email: ".$pi_email." already in use. Check and fix row: " . $row . " of .csv file to upload user.";
+	   $log['notice'][] = "Email: ".$pi_email." already in use. Project will be connected to this user.";
+	   //cfar_print_log_messages($log);
+	   $user = get_user_by( 'email', $pi_email );
+	   $user_id = $user->ID;
+	   $user_name = $user->user_login;
+	   //return;       	       
        } elseif ($pi_email == ''){
 	   $log['error'][] = "No email entered for ".$pi_name." Check and fix row: " . $row . " of .csv file to upload user and corresponding projects.";
 	   cfar_print_log_messages($log);
