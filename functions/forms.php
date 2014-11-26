@@ -172,22 +172,22 @@ function cfar_assign_the_ticket($entry, $form) {
 	//Routing based on Core's main contact	- currently settings for testing
 		switch ($selected_core) {
 		    case "biostatistics":
-			$value = 'matt@andisites.com';
+			$value = 'kmollan@email.unc.edu';
 			break;
 		    case "clinical":
-			$value = 'matt@andisites.com';
+			$value = 'oksana_zakharova@med.unc.edu';
 			break;
 		    case "clinical-pharmacology":
-			$value = 'matt@andisites.com';
+			$value = 'akashuba@unc.edu';
 			break;
 		    case "developmental":
-			$value = 'matt@andisites.com';
+			$value = 'cathy@unc.edu';
 			break;	
 		    case "social-behavorial-science":
-			$value = 'matt@andisites.com';
+			$value = 'jessica_carda-auten@med.unc.edu';
 			break;
 		    case "virology-immunology-microbiology":
-			$value = 'matt@andisites.com';
+			$value = 'julie_nelson@med.unc.edu';
 			break;			
 		}   
 	$user = get_user_by( $field, $value );	
